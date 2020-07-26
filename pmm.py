@@ -7,7 +7,7 @@ from colors import colors
 from help_menu import help_menu
 
 
-version="0.2"
+version="0.3"
 debug=False
 config_dir=sys.argv[1]
 
