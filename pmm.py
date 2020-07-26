@@ -9,7 +9,7 @@ from help_menu import help_menu
 
 version="0.2"
 debug=False
-config_dir="~/.config/pmm/"
+config_dir=sys.argv[1]
 
 
 # Check if has superuser privileges
@@ -95,7 +95,7 @@ def check():
 
 
 # Main Program
-i = 1
+i = 2
 while (i < len(sys.argv)):
     if (sys.argv[i][0:1] == "-"):
         if (sys.argv[i] == "--dnf"):

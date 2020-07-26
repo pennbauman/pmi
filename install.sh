@@ -8,6 +8,6 @@ sudo cp colors.py $install_dir
 
 sudo mkdir -p $install_dir
 sudo cp pmm.py $install_dir
-sudo chmod 755 /bin/p,,
+sudo chmod 755 /bin/pmm
 sudo cp help_menu.py $install_dir
 sudo cp -r managers $install_dir
