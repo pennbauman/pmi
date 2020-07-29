@@ -31,7 +31,7 @@ Generally if a manager is not specified all are used.
 
 - `disable` Disable manager or interactively choose managers to disable.
 
-- `check` [Unimplemented!] Check for updates.
+- `check` Check for updates in particular manager or in all managers, if no manager is specified.
 
 - `update` [Unimplemented!] Update.
 

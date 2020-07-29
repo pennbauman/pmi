@@ -103,6 +103,15 @@ if (command == "disable"):
 
 # Check for available updates
 if (command == "check"):
+    if (manager == ""):
+        fin = 0
+        for m in managers:
+            result = managers[m].check()
+            if (result == 8):
+                fin = 8
+        sys.exit(fin)
+    else:
+        sys.exit(managers[manager].check())
     print(colors.violet + "Unimplemented $ pmm check" + colors.none)
 # Update packages
 if (command == "update"):

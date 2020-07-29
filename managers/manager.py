@@ -69,3 +69,7 @@ class manager:
         else:
             print(colors.violet + "Unimplemented manager.disable()" + colors.none)
 
+    # Check for updates
+    def check(self):
+        print(colors.violet + self.title + ": check() unimplemented" + colors.none)
+        sys.exit(1)
