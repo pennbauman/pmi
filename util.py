@@ -25,3 +25,13 @@ def get_config_dir():
             print(colors.red + "Error: $HOME cannot be determined" + colors.none)
             sys.exit(1)
     return config_dir
+
+def ask(question):
+    while True:
+        response = input(question + " [y/n]: ")
+        if (response == "y") or (response == "Y"):
+            return True
+        elif (response == "n") or (response == "N"):
+            return False
+        else:
+            print("  Please response 'y' or 'n'")

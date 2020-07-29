@@ -8,7 +8,7 @@ import util
 import colors
 
 VERSION="0.3"
-DEBUG=True
+DEBUG=False
 
 # Import Managers
 managers = {}
@@ -72,21 +72,24 @@ if (command == "enable"):
             if managers[m].ready():
                 managers[m].enable()
             else:
-                while True:
-                    response = input("Configure " + m + "? [y/n]: ")
-                    if (response == "y") or (response == "Y"):
-                        managers[m].enable()
-                        break
-                    elif (response == "n") or (response == "N"):
-                        break
-                    else:
-                        print("  Invalid response")
+                if util.ask("Enable " + managers[m].get_title()):
+                    managers[m].enable()
     else:
-        manager[manager].enable()
+        managers[manager].enable()
     sys.exit(0)
 # Disable specific manager, or enter interactive disabler
+if (command == "disable"):
+    if (manager == ""):
+        for m in managers:
+            if (managers[m].state() == -1):
+                managers[m].disable()
+            else:
+                if util.ask("Disable " + managers[m].get_title()):
+                    managers[m].disable()
+    else:
+        managers[manager].disable()
+    sys.exit(0)
 
 # Check for available updates
-
 # Update packages
 

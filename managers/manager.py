@@ -39,6 +39,14 @@ class manager:
     def ready(self):
         return (self.config_state > 0)
 
+    # Get config state
+    def state(self):
+        return self.config_state
+
+    # Return title
+    def get_title(self):
+        return self.title
+
     # Enable manager
     def enable(self):
         if (self.config_state < 0):
@@ -50,5 +58,16 @@ class manager:
             print(colors.green + self.title + " successfully enabled." + colors.none)
         else:
             print(self.title + " already enabled.")
-    #def check()
-    #def config()
+
+    # Disable manager
+    def disable(self):
+        if (self.config_state == -1):
+            print(self.title + " already disabled.")
+        elif (self.config_state == 0):
+            config = open(util.get_config_dir() + "/config", 'a')
+            config.write(self.name + ":disabled\n")
+            config.close()
+            print(colors.green + self.title + " successfully disabled." + colors.none)
+        else:
+            print(colors.violet + "Unimplemented manager.disable()" + colors.none)
+
