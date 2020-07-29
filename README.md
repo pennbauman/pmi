@@ -5,22 +5,35 @@ A tool to allow managing packages form multiple package managers simultaneously.
 
 	./install.sh
 
-	pmm configure
+	pmm setup
 
 ## Usage
 
-	pmm [command] [options] [package]
+	pmm [manager] [command]
+
+#### Managers
+- [DNF](https://fedoraproject.org/wiki/DNF)
+
+- [Flatpak](https://www.flatpak.org/)
+
+Generally if a manager is not specified all are used.
 
 #### Commands
-If run with no commands update is used.
+- `version` Prints version number.
 
-`update` Updates all packages or the specified package.
+- `help` Prints help menu.
 
-`check` Check for updates for all packages or the specified package. Has a exit status of 8 if updates are available.
+- `setup` Setup managers to be used.
 
-#### Options
+- `state` Print the current configurations for all managers.
 
-`--dnf` Specify the DNF package manager.
+- `enable` Enable manager or interactively choose managers to enable.
 
-`--flatpak` Specify the Flatpak package manager.
+- `disable` Disable manager or interactively choose managers to disable.
+
+- `check` [Unimplemented!] Check for updates.
+
+- `update` [Unimplemented!] Update.
+
+If no commands is specified update is run.
 

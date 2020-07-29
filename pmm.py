@@ -7,6 +7,7 @@ import os
 import util
 import colors
 
+# Globals
 VERSION="0.3"
 DEBUG=False
 
@@ -34,6 +35,7 @@ if (len(sys.argv) > 1):
         command = sys.argv[1]
         if (len(sys.argv) > 2):
             options = sys.argv[2:]
+# Check default option
 if (command == ""):
     command = "update"
 if DEBUG:
@@ -63,8 +65,17 @@ if (command == "state"):
 # Preform interactive setup
 if (command == "setup"):
     print(colors.bold + "Package Manager Manager Setup" + colors.none)
-    print(colors.violet + "> Add text\n" + colors.none)
-    command = "enable"
+    print("Enable any managers you want to use.")
+    print()
+    for m in managers:
+        if util.ask("Enable " + managers[m].get_title()):
+            managers[m].enable()
+        else:
+            if util.ask("Disable " + managers[m].get_title()):
+                managers[m].disable()
+    print()
+    print("PMM is now configured.")
+    print("If you need more information run 'pmm help'.")
 # Enable specific manager, or enter interactive enabler
 if (command == "enable"):
     if (manager == ""):
@@ -91,5 +102,9 @@ if (command == "disable"):
     sys.exit(0)
 
 # Check for available updates
+if (command == "check"):
+    print(colors.violet + "Unimplemented $ pmm check" + colors.none)
 # Update packages
+if (command == "update"):
+    print(colors.violet + "Unimplemented $ pmm update" + colors.none)
 

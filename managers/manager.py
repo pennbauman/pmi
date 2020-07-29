@@ -19,10 +19,12 @@ class manager:
     # Initialize and check configuration
     def __init__(self):
         self.name = self.__class__.__name__
+        # Check manager installed
         if not util.has_cmd(self.name):
             config_state = -2
             return
         try:
+            # Read config
             config = open(util.get_config_dir() + "/config", "r").readlines()
             for line in config:
                 line = line.replace(" ", "")
@@ -52,9 +54,7 @@ class manager:
         if (self.config_state < 0):
             print(colors.violet + "Unimplemented manager.enable()" + colors.none)
         if (self.config_state == 0):
-            config = open(util.get_config_dir() + "/config", 'a')
-            config.write(self.name + ":enabled\n")
-            config.close()
+            config = open(util.get_config_dir() + "/config", 'a').write(self.name + ":enabled\n")
             print(colors.green + self.title + " successfully enabled." + colors.none)
         else:
             print(self.title + " already enabled.")
@@ -64,9 +64,7 @@ class manager:
         if (self.config_state == -1):
             print(self.title + " already disabled.")
         elif (self.config_state == 0):
-            config = open(util.get_config_dir() + "/config", 'a')
-            config.write(self.name + ":disabled\n")
-            config.close()
+            config = open(util.get_config_dir() + "/config", 'a').write(self.name + ":disabled\n")
             print(colors.green + self.title + " successfully disabled." + colors.none)
         else:
             print(colors.violet + "Unimplemented manager.disable()" + colors.none)
