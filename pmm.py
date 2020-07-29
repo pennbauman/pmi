@@ -3,150 +3,90 @@
 #   https://github.com/pennbauman/pmm
 import sys
 import os
-from colors import colors
-from help_menu import help_menu
 
+import util
+import colors
 
-version="0.3"
-debug=False
-config_dir=sys.argv[1]
+VERSION="0.3"
+DEBUG=True
 
-
-# Check if has superuser privileges
-def issudo():
-    return os.geteuid() == 0
-# Check if system has command
-def hascmd(command):
-    return os.system("command -v " + command + "&> /dev/null") == 0
-
+# Import Managers
 managers = {}
-if hascmd("dnf"):
+if util.has_cmd("dnf"):
     from managers.dnf import dnf
-    managers["dnf"] = dnf(config_dir, debug)
-if hascmd("flatpak"):
+    managers['dnf'] = dnf()
+if util.has_cmd("flatpak"):
     from managers.flatpak import flatpak
-    managers["flatpak"] = flatpak(config_dir, debug)
+    managers['flatpak'] = flatpak()
 
-
-
-# Global Variables
-command=""
+# Parse command line options
 manager=""
-#remote=""
-package=""
-
-
-
-# Functions
-def find(package):
-    for m in managers:
-        if managers[m].find(package):
-            return True
-    return False
-
-def update():
-    if debug:
-        print("> update " + str(package))
-    if not issudo():
-        print(colors.red + "ERROR: This command must be run with superuser privileges" + colors.none)
-        sys.exit(1)
-    if (manager == ""):
-        if (package == ""):
-            for m in managers:
-                managers[m].update()
-        else:
-            for m in managers:
-                if managers[m].find(package):
-                    managers[m].update(package)
+command=""
+options=[]
+if (len(sys.argv) > 1):
+    if sys.argv[1] in managers:
+        manager = sys.argv[1]
+        if (len(sys.argv) > 2):
+            command = sys.argv[2]
+        if (len(sys.argv) > 3):
+            options = sys.argv[3:]
     else:
-        if (package == ""):
-            managers[manager].update()
-        else:
-            managers[manager].update(package)
-
-def check():
-    if debug:
-        print("> check " + str(package))
-    result = 0
-    if (manager == ""):
-        if (package == ""):
-            for m in managers:
-                r = managers[m].update()
-                if (r == 8):
-                    result = 8
-        else:
-            if not find(package):
-                for m in managers:
-                    managers[m].check(package)
-                return 1
-            else:
-                for m in managers:
-                    if managers[m].find(package):
-                        r = managers[m].check(package)
-                        if (r == 8):
-                            result = 8
-    else:
-        if (package != ""):
-            r = managers[manager].update()
-            if (r == 8):
-                result = 8
-    return result
-
-
-
-# Main Program
-i = 2
-while (i < len(sys.argv)):
-    if (sys.argv[i][0:1] == "-"):
-        if (sys.argv[i] == "--dnf"):
-            manager = "dnf"
-        elif (sys.argv[i] == "--flatpak"):
-            manager = "flatpak"
-        else:
-            print("unknown option '" + sys.argv[i] + "'")
-            sys.exit()
-    else:
-        if (command == ""):
-            command = sys.argv[i]
-        elif (package == ""):
-            if debug:
-                print("package: " + sys.argv[i])
-            package = sys.argv[i]
-        else:
-            print(colors.red + "ERROR: Too many command provided" + colors.none)
-            sys.exit(1)
-    i += 1
-
+        command = sys.argv[1]
+        if (len(sys.argv) > 2):
+            options = sys.argv[2:]
 if (command == ""):
     command = "update"
+if DEBUG:
+    print("M: '%s', C: '%s', O: %s" % (manager, command, options))
 
+# Print version
 if (command == "version"):
-    print("Package Manager Manager : v" + version)
-    sys.exit()
-elif (command == "help"):
-    help_menu(manager)
-    sys.exit()
-elif (command == "configure"):
+    print("Package Manager Manager : v" + VERSION)
+    sys.exit(0)
+# Print Help Menu
+#   Varies based on manager?
+if (command == "help"):
+    print(colors.bold + "Package Manager Manager Help" + colors.none)
+    print(colors.violet + "> Add text\n" + colors.none)
+    sys.exit(0)
+# Print state of all manager (config file)
+#   Print state for indivigual managers? when we get more complex configs?
+if (command == "state"):
+    try:
+        config = open(util.get_config_dir() + "/config", 'r').readlines()
+        for line in config:
+            print(line.replace("\n", ""))
+    except:
+        print(colors.red + "Error: PMM must be configed" + colors.none)
+        sys.exit(1)
+    sys.exit(0)
+# Preform interactive setup
+if (command == "setup"):
+    print(colors.bold + "Package Manager Manager Setup" + colors.none)
+    print(colors.violet + "> Add text\n" + colors.none)
+    command = "enable"
+# Enable specific manager, or enter interactive enabler
+if (command == "enable"):
     if (manager == ""):
-        print(colors.red + "ERROR: Manager must be provided to configure" + colors.none)
+        for m in managers:
+            if managers[m].ready():
+                managers[m].enable()
+            else:
+                while True:
+                    response = input("Configure " + m + "? [y/n]: ")
+                    if (response == "y") or (response == "Y"):
+                        managers[m].enable()
+                        break
+                    elif (response == "n") or (response == "N"):
+                        break
+                    else:
+                        print("  Invalid response")
     else:
-        if (os.system("echo '' > " + config_dir + manager) == 0):
-            print(colors.green + manager + " condigured" + colors.none)
-            sys.exit(0)
-        else:
-            sys.exit(1)
+        manager[manager].enable()
+    sys.exit(0)
+# Disable specific manager, or enter interactive disabler
 
-elif (command == "update"):
-    update()
+# Check for available updates
 
-elif (command == "check"):
-    sys.exit(check())
+# Update packages
 
-#elif (command == "search"):
-#elif (command == "install"):
-#elif (command == "remove"):
-#elif (command == "info"):
-#elif (command == "list"):
-
-#elif (command == "manager"):
-#elif (command == "source"):
