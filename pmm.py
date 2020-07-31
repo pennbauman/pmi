@@ -44,6 +44,9 @@ managers = {}
 if util.has_cmd("dnf"):
     from managers.dnf import dnf
     managers['dnf'] = dnf()
+if util.has_cmd("yum"):
+    from managers.yum import yum
+    managers['yum'] = yum()
 if util.has_cmd("flatpak"):
     from managers.flatpak import flatpak
     managers['flatpak'] = flatpak()
