@@ -13,22 +13,31 @@ DEBUG=False
 HELP=colors.bold + "Package Manager Manager" + colors.none + "\n\
 \n\
 Usage:\n\
-  pmm [manager] [command]\n\
+  pmm [manager] [command] [subcommand]\n\
 \n\
 Managers:\n\
-  all (defualt)    : Run command for all mangers\n\
-  dnf              : Fedora DNF\n\
-  flatpak          : Flatpak\n\
+  all       : (Default) Run command for all mangers\n\
+  dnf       : Fedora DNF\n\
+  flatpak   : Flatpak\n\
 \n\
 Commands:\n\
-  version          : Print version number\n\
-  help             : Print this help menu\n\
-  setup            : Setup PMM and enable or disable managers\n\
-  state            : Check the state of available managers\n\
-  enable           : Enable the specified manager or picked managers\n\
-  disable          : Disable the specified manager or picked managers\n\
-  check            : Check for updates\n\
-  update (default) : Upcoming\
+  version   : Print version number\n\
+    message   : (Default) Print message with number\n\
+    number    : Print only number\n\
+\n\
+  help      : Print this help menu\n\
+  setup     : Setup PMM and enable or disable managers\n\
+  state     : Check the state of available managers\n\
+  enable    : Enable the specified manager or picked managers\n\
+    ask       : (Default when manager is all) Ask before enabling\n\
+    auto      : (Default when manager specified) Do not ask before enabling\n\
+\n\
+  disable   : Disable the specified manager or picked managers\n\
+    ask       : (Default when manager is all) Ask before disabling\n\
+    auto      : (Default when manager specified) Do not ask before disabling\n\
+\n\
+  check     : Check for updates\n\
+  update    : (Default) Upcoming\
 "
 
 # Import Managers
@@ -45,7 +54,7 @@ manager=""
 command=""
 options=[]
 if (len(sys.argv) > 1):
-    if sys.argv[1] in managers:
+    if sys.argv[1] in managers or (sys.argv[1] == "all"):
         manager = sys.argv[1]
         if (len(sys.argv) > 2):
             command = sys.argv[2]
@@ -63,7 +72,10 @@ if DEBUG:
 
 # Print version
 if (command == "version"):
-    print("Package Manager Manager : v" + VERSION)
+    if (len(options) > 0) and (options[0] == "ask"):
+        print(VERSION)
+    else:
+        print("Package Manager Manager : v" + VERSION)
     sys.exit(0)
 # Print Help Menu
 #   Varies based on manager?
@@ -102,25 +114,39 @@ if (command == "state"):
 if (command == "enable"):
     if (manager == ""):
         for m in managers:
-            if managers[m].ready():
+            if (options[0] == "auto"):
                 managers[m].enable()
             else:
-                if util.ask("Enable " + managers[m].get_title()):
+                if managers[m].ready():
                     managers[m].enable()
+                else:
+                    if util.ask("Enable " + managers[m].get_title()):
+                        managers[m].enable()
     else:
-        managers[manager].enable()
+        if (options[0] == "ask"):
+            if util.ask("Enable " + managers[manager].get_title()):
+                managers[manager].enable()
+        else:
+            managers[manager].enable()
     sys.exit(0)
 # Disable specific manager, or enter interactive disabler
 if (command == "disable"):
     if (manager == ""):
         for m in managers:
-            if (managers[m].state() == -1):
+            if (options[0] == "auto"):
                 managers[m].disable()
             else:
-                if util.ask("Disable " + managers[m].get_title()):
+                if (managers[m].state() == -1):
                     managers[m].disable()
+                else:
+                    if util.ask("Disable " + managers[m].get_title()):
+                        managers[m].disable()
     else:
-        managers[manager].disable()
+        if (options[0] == "ask"):
+            if util.ask("Disable " + managers[manager].get_title()):
+                managers[manager].disable()
+        else:
+            managers[manager].disable()
     sys.exit(0)
 
 # Check for available updates
@@ -151,3 +177,6 @@ if (command == "update"):
     print(colors.violet + "Unimplemented $ pmm update" + colors.none)
     sys.exit(1)
 
+# Error out if command is not found
+print(colors.red + "Error: Unknown command '" + command + "'" + colors.none)
+sys.exit(1)
