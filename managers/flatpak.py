@@ -15,7 +15,5 @@ class flatpak(manager):
             print(colors.red + "Error: " + self.title + " not enabled.")
             return 1
         if (os.system("flatpak update &> /dev/null") == 256):
-            print(colors.green + self.title + ": Updates available." + colors.none)
             return 8
-        print(colors.yellow + self.title + ": No updates available." + colors.none)
         return 0
