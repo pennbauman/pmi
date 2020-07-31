@@ -49,27 +49,44 @@ class manager:
     def get_title(self):
         return self.title
 
+    # Check if enabled and error if not
+    def check_enabled(self):
+        if (self.config_state == -2):
+            print(colors.red + "Error: " + self.title + " isn't even installed" + colors.none)
+            sys.exit(1)
+        if (self.config_state == -1):
+            print(colors.red + "Error: " + self.title + " is disabled" + colors.none)
+            sys.exit(1)
+        if (self.config_state == 0):
+            print(colors.red + "Error: " + self.title + " must be enabled or disabled before use." + colors.none)
+            sys.exit(1)
+
+
+
     # Enable manager
     def enable(self):
-        if (self.config_state < 0):
-            print(colors.violet + "Unimplemented manager.enable()" + colors.none)
-        if (self.config_state == 0):
-            config = open(util.get_config_dir() + "/config", 'a').write(self.name + ":enabled\n")
-            print(colors.green + self.title + " successfully enabled." + colors.none)
-        else:
+        if (self.config_state == 1):
             print(self.title + " already enabled.")
+        else:
+            os.system("sed '/" + self.name + "/d' -i " + util.get_config_dir() + "/config")
+            config = open(util.get_config_dir() + "/config", 'a').write(self.name + ":enabled\n")
+            print(self.title + " successfully enabled.")
 
     # Disable manager
     def disable(self):
         if (self.config_state == -1):
             print(self.title + " already disabled.")
-        elif (self.config_state == 0):
-            config = open(util.get_config_dir() + "/config", 'a').write(self.name + ":disabled\n")
-            print(colors.green + self.title + " successfully disabled." + colors.none)
         else:
-            print(colors.violet + "Unimplemented manager.disable()" + colors.none)
+            os.system("sed '/" + self.name + "/d' -i " + util.get_config_dir() + "/config")
+            config = open(util.get_config_dir() + "/config", 'a').write(self.name + ":disabled\n")
+            print(self.title + " successfully disabled.")
 
     # Check for updates
     def check(self):
         print(colors.violet + self.title + ": check() unimplemented" + colors.none)
+        sys.exit(1)
+
+    # Preform updates
+    def update(self):
+        print(colors.violet + self.title + ": update() unimplemented" + colors.none)
         sys.exit(1)

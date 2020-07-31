@@ -11,9 +11,7 @@ class flatpak(manager):
 
     # Check for updates
     def check(self):
-        if not self.ready():
-            print(colors.red + "Error: " + self.title + " not enabled.")
-            return 1
+        self.check_enabled()
         if (os.system("flatpak update &> /dev/null") == 256):
             return 8
         return 0

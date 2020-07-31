@@ -27,7 +27,7 @@ Commands:\n\
 \n\
   help      : Print this help menu\n\
   setup     : Setup PMM and enable or disable managers\n\
-  state     : Check the state of available managers\n\
+  status    : Check the state of available managers\n\
   enable    : Enable the specified manager or picked managers\n\
     ask       : (Default when manager is all) Ask before enabling\n\
     auto      : (Default when manager specified) Do not ask before enabling\n\
@@ -37,8 +37,7 @@ Commands:\n\
     auto      : (Default when manager specified) Do not ask before disabling\n\
 \n\
   check     : Check for updates\n\
-  update    : (Default) Upcoming\
-"
+  update    : (Default) Upcoming"
 
 # Import Managers
 managers = {}
@@ -70,6 +69,8 @@ if (command == ""):
 if DEBUG:
     print("M: '%s', C: '%s', O: %s" % (manager, command, options))
 
+
+
 # Print version
 if (command == "version"):
     if (len(options) > 0) and (options[0] == "ask"):
@@ -97,24 +98,27 @@ if (command == "setup"):
     print("PMM is now configured.")
     print("If you need more information run 'pmm help'.")
     sys.exit(0)
-# Print state of all manager (config file)
-#   Print state for indivigual managers? when we get more complex configs?
-if (command == "state"):
-    try:
-        config = open(util.get_config_dir() + "/config", 'r').readlines()
-        for line in config:
-            parts = line.replace("\n", "").split(":")
-            print("%-8s : %s" % (managers[parts[0]].get_title(), parts[1]))
-    except:
-        print(colors.red + "Error: PMM must be configured." + colors.none)
-        print("Run 'pmm setup' to configure.")
-        sys.exit(1)
+# Print status of all manager (config file)
+#   Print status for indivigual managers? when we get more complex configs?
+if (command == "status"):
+    for m in managers:
+        state = managers[m].state()
+        if (state == 1):
+            print(colors.green, end='')
+            print("%-8s : Enabled" % (managers[m].get_title()))
+        elif (state == 0):
+            print(colors.red, end='')
+            print("%-8s : None" % (managers[m].get_title()))
+        elif (state == -1):
+            print(colors.yellow, end='')
+            print("%-8s : Disabled" % (managers[m].get_title()))
+        print(colors.none, end='')
     sys.exit(0)
 # Enable specific manager, or enter interactive enabler
 if (command == "enable"):
     if (manager == ""):
         for m in managers:
-            if (options[0] == "auto"):
+            if (len(options) > 0) and (options[0] == "auto"):
                 managers[m].enable()
             else:
                 if managers[m].ready():
@@ -123,7 +127,7 @@ if (command == "enable"):
                     if util.ask("Enable " + managers[m].get_title()):
                         managers[m].enable()
     else:
-        if (options[0] == "ask"):
+        if (len(options) > 0) and (options[0] == "ask"):
             if util.ask("Enable " + managers[manager].get_title()):
                 managers[manager].enable()
         else:
@@ -133,7 +137,7 @@ if (command == "enable"):
 if (command == "disable"):
     if (manager == ""):
         for m in managers:
-            if (options[0] == "auto"):
+            if (len(options) > 0) and (options[0] == "auto"):
                 managers[m].disable()
             else:
                 if (managers[m].state() == -1):
@@ -142,12 +146,23 @@ if (command == "disable"):
                     if util.ask("Disable " + managers[m].get_title()):
                         managers[m].disable()
     else:
-        if (options[0] == "ask"):
+        if (len(options) > 0) and (options[0] == "ask"):
             if util.ask("Disable " + managers[manager].get_title()):
                 managers[manager].disable()
         else:
             managers[manager].disable()
     sys.exit(0)
+
+
+# Check for unconfigured managers
+unconfigured = False
+for m in managers:
+    if (managers[m].state() == 0):
+        print(colors.red + "Error: " + managers[m].get_title() + " must be enabled or disabled before use." + colors.none)
+        unconfigured = True
+if unconfigured:
+    sys.exit(1)
+
 
 # Check for available updates
 if (command == "check"):
@@ -160,7 +175,7 @@ if (command == "check"):
                 print("%-8s : Updates available" % (managers[m].get_title()))
                 print(colors.none, end='')
                 fin = 8
-            else:
+            elif (result == 0):
                 print(colors.yellow, end='')
                 print("%-8s : No updates available" % (managers[m].get_title()))
                 print(colors.none, end='')

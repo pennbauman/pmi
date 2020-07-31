@@ -11,9 +11,7 @@ class dnf(manager):
 
     # Check for updates
     def check(self):
-        if not self.ready():
-            print(colors.red + "Error: " + self.title + " not enabled.")
-            return 1
-        if (os.system("dnf check-update &> /dev/null") == 400):
+        self.check_enabled()
+        if (os.system("dnf check-update &> /dev/null") == 100):
             return 8
         return 0
