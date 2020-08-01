@@ -18,10 +18,12 @@ class manager:
 
     # Initialize and check configuration
     def __init__(self):
+        self.check_code=-1
+        self.check_text=[]
         self.name = self.__class__.__name__
         # Check manager installed
         if not util.has_cmd(self.name):
-            config_state = -2
+            self.config_state = -2
             return
         try:
             # Read config
@@ -37,20 +39,25 @@ class manager:
         except:
             self.config_state=0
 
-    # Check if manager is configured
-    def ready(self):
-        return (self.config_state > 0)
-
-    # Get config state
-    def state(self):
-        return self.config_state
 
     # Return title
     def get_title(self):
         return self.title
 
+    def get_title_formated(self):
+        return "{:<8} : ".format(self.title)
+
+
+    # Get config state
+    def state(self):
+        return self.config_state
+
+    # Check if manager is configured
+    def enabled(self):
+        return (self.config_state > 0)
+
     # Check if enabled and error if not
-    def check_enabled(self):
+    def enabled_error(self):
         if (self.config_state == -2):
             print(colors.red + "Error: " + self.title + " isn't even installed" + colors.none)
             sys.exit(1)
@@ -81,12 +88,15 @@ class manager:
             config = open(util.get_config_dir() + "/config", 'a').write(self.name + ":disabled\n")
             print(self.title + " successfully disabled.")
 
-    # Check for updates
+
+    # Check for updates, setup check data for printing
     def check(self):
-        print(colors.violet + self.title + ": check() unimplemented" + colors.none)
+        print(colors.violet + self.title + ": check_run() unimplemented" + colors.none)
         sys.exit(1)
+
 
     # Preform updates
     def update(self):
+        self.enabled_error()
         print(colors.violet + self.title + ": update() unimplemented" + colors.none)
         sys.exit(1)

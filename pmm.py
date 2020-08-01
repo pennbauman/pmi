@@ -23,7 +23,7 @@ Managers:\n\
 Commands:\n\
   version   : Print version number\n\
     message   : (Default) Print message with number\n\
-    number    : Print only number\n\
+    number    : Print only the version number\n\
 \n\
   help      : Print this help menu\n\
   setup     : Setup PMM and enable or disable managers\n\
@@ -37,6 +37,10 @@ Commands:\n\
     auto      : (Default when manager specified) Do not ask before disabling\n\
 \n\
   check     : Check for updates\n\
+    terse     : Print only if updates were found or not\n\
+    list      : (Default) Print if updates were found and lists of packages\n\
+    count     : Print the number of packages to update (0 for no updates)\n\
+\n\
   update    : (Default) Upcoming"
 
 # Import Managers
@@ -169,27 +173,55 @@ if unconfigured:
 
 # Check for available updates
 if (command == "check"):
+    if (len(options) == 0):
+        options = ["list"]
     if (manager == ""):
         fin = 0
-        for m in managers:
-            result = managers[m].check()
-            if (result == 8):
-                print(colors.green, end='')
-                print("%-8s : Updates available" % (managers[m].get_title()))
-                print(colors.none, end='')
+        count = 0
+        for m in managers.values():
+            if not m.enabled():
+                continue
+            result = m.check()
+            if (m.check_code == 8):
                 fin = 8
-            elif (result == 0):
-                print(colors.yellow, end='')
-                print("%-8s : No updates available" % (managers[m].get_title()))
-                print(colors.none, end='')
+            if (options[0] == "terse") or (options[0] == "list"):
+                if (m.check_code == 8):
+                    print(colors.green + m.get_title_formated() + "Updates available." + colors.none)
+                else:
+                    print(colors.yellow + m.get_title_formated() + "No updates available." + colors.none)
+            if (options[0] == "terse"):
+                pass
+            elif (options[0] == "list"):
+                if (m.check_code == 8):
+                    for p in m.check_text:
+                        print("  " + p)
+            elif (options[0] == "count"):
+                count += len(m.check_text)
+            else:
+                print(colors.red + "Error: unkown check subcommand '" + options[0] + "'" + colors.none)
+        if (options[0] == "count"):
+            print(count)
         sys.exit(fin)
     else:
-        result = managers[manager].check()
-        if (result == 8):
-            print(colors.green + managers[manager].get_title() + " : Updates available." + colors.none)
+        managers[manager].check()
+        if (options[0] == "terse") or (options[0] == "list"):
+            if (managers[manager].check_code == 8):
+                print(colors.green + managers[manager].get_title_formated() + "Updates available." + colors.none)
+            else:
+                print(colors.yellow + managers[manager].get_title_formated() + "No updates available." + colors.none)
+        if (options[0] == "terse"):
+            pass
+        elif (options[0] == "list"):
+            if (managers[manager].check_code == 8):
+                for p in managers[manager].check_text:
+                    print("  " + p)
+        elif (options[0] == "count"):
+            print(len(managers[manager].check_text))
         else:
-            print(colors.yellow + managers[manager].get_title() + " : No updates available." + colors.none)
-        sys.exit(result)
+            print(colors.red + "Error: unkown check subcommand '" + options[0] + "'" + colors.none)
+        sys.exit(managers[manager].check_code)
+
+
 # Update packages
 if (command == "update"):
     print(colors.violet + "Unimplemented $ pmm update" + colors.none)
