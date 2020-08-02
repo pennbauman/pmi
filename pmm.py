@@ -36,7 +36,8 @@ Commands:\n\
     ask       : (Default when manager is all) Ask before disabling\n\
     auto      : (Default when manager specified) Do not ask before disabling\n\
 \n\
-  check     : Check for updates\n\
+  check     : Check for updates, return code is 8 when updates are available\n\
+    silent    : Print nothing, for using only the return code\n\
     terse     : Print only if updates were found or not\n\
     list      : (Default) Print if updates were found and lists of packages\n\
     count     : Print the number of packages to update (0 for no updates)\n\
@@ -195,7 +196,9 @@ if (command == "check"):
                     print(colors.green + m.title_formated + "Updates available." + colors.none)
                 else:
                     print(colors.yellow + m.title_formated + "No updates available." + colors.none)
-            if (options[0] == "terse"):
+            if (options[0] == "silent"):
+                pass
+            elif (options[0] == "terse"):
                 pass
             elif (options[0] == "list"):
                 if (m.check_code == 8):

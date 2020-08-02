@@ -2,38 +2,50 @@
 A tool to allow managing packages form multiple package managers simultaneously.
 
 ## Install & Configure
+Requires root access:
 
 	./install.sh
 
 	pmm setup
 
-## Usage
+## Use
 
-	pmm [manager] [command]
+	pmm [manager] [command] [subcommand]
 
-#### Managers
+### Managers
 - [DNF](https://fedoraproject.org/wiki/DNF)
+
+- [Yum](https://fedoraproject.org/wiki/Yum)
 
 - [Flatpak](https://www.flatpak.org/)
 
 Generally if a manager is not specified all are used.
 
-#### Commands
-- `version` Prints version number.
+### Commands & Subcommands
+- `version` Print version number
+    - `message` (Default) Print message with number
+    - `number` Print only the version number
 
-- `help` Prints help menu.
+- `help` Print this help menu
 
-- `setup` Setup managers to be used.
+- `setup` Setup PMM and enable or disable managers
 
-- `state` Print the current configurations for all managers.
+- `status` Check the state of available managers
 
-- `enable` Enable manager or interactively choose managers to enable.
+- `enable` Enable the specified manager or picked managers
+    - `ask` (Default when manager is all) Ask before enabling
+    - `auto` (Default when manager specified) Do not ask before enabling
 
-- `disable` Disable manager or interactively choose managers to disable.
+- `disable` Disable the specified manager or picked managers
+    - `ask` (Default when manager is all) Ask before disabling
+    - `auto`(Default when manager specified) Do not ask before disabling
 
-- `check` Check for updates in particular manager or in all managers, if no manager is specified.
+- `check` Check for updates, return code is 8 when updates are available
+    - `silent` Print nothing, for using only the return code
+    - `terse` Print only if updates were found or not
+    - `list` (Default) Print if updates were found and lists of packages
+    - `count` Print the number of packages to update (0 for no updates)
 
-- `update` [Unimplemented!] Update.
+- `update` (Default) Upcoming"
 
-If no commands is specified update is run.
-
+If a command or subcommand is not specified the default is used.
