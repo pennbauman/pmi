@@ -21,6 +21,7 @@ class manager:
         self.check_code=-1
         self.check_text=[]
         self.name = self.__class__.__name__
+        self.title_formated = "{:<8} : ".format(self.title)
         # Check manager installed
         if not util.has_cmd(self.name):
             self.config_state = -2
@@ -38,23 +39,6 @@ class manager:
                     break
         except:
             self.config_state=0
-
-
-    # Return title
-    def get_title(self):
-        return self.title
-
-    def get_title_formated(self):
-        return "{:<8} : ".format(self.title)
-
-
-    # Get config state
-    def state(self):
-        return self.config_state
-
-    # Check if manager is configured
-    def enabled(self):
-        return (self.config_state > 0)
 
     # Check if enabled and error if not
     def enabled_error(self):

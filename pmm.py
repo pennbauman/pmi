@@ -55,6 +55,7 @@ if util.has_cmd("flatpak"):
     from managers.flatpak import flatpak
     managers['flatpak'] = flatpak()
 
+
 # Parse command line options
 manager=""
 command=""
@@ -109,7 +110,7 @@ if (command == "setup"):
 #   Print status for indivigual managers? when we get more complex configs?
 if (command == "status"):
     for m in managers:
-        state = managers[m].state()
+        state = managers[m].config_state
         if (state == 1):
             print(colors.green, end='')
             print("%-8s : Enabled" % (managers[m].get_title()))
@@ -147,7 +148,7 @@ if (command == "disable"):
             if (len(options) > 0) and (options[0] == "auto"):
                 managers[m].disable()
             else:
-                if (managers[m].state() == -1):
+                if (managers[m].config_state == -1):
                     managers[m].disable()
                 else:
                     if util.ask("Disable " + managers[m].get_title()):
@@ -164,11 +165,16 @@ if (command == "disable"):
 # Check for unconfigured managers
 unconfigured = False
 for m in managers:
-    if (managers[m].state() == 0):
+    if (managers[m].config_state == 0):
         print(colors.red + "Error: " + managers[m].get_title() + " must be enabled or disabled before use." + colors.none)
         unconfigured = True
 if unconfigured:
     sys.exit(1)
+
+# Check if duplicate managers are inabled
+if "dnf" in managers and "yum" in managers:
+    if (managers["yum"].config_state == 1) and (managers["yum"].config_state == 1):
+        print(colors.yellow + "Warning: Both Yum and DNF installed, will be duplicates." + colors.none)
 
 
 # Check for available updates
@@ -179,16 +185,16 @@ if (command == "check"):
         fin = 0
         count = 0
         for m in managers.values():
-            if not m.enabled():
+            if (m.config_state < 1):
                 continue
             result = m.check()
             if (m.check_code == 8):
                 fin = 8
             if (options[0] == "terse") or (options[0] == "list"):
                 if (m.check_code == 8):
-                    print(colors.green + m.get_title_formated() + "Updates available." + colors.none)
+                    print(colors.green + m.title_formated + "Updates available." + colors.none)
                 else:
-                    print(colors.yellow + m.get_title_formated() + "No updates available." + colors.none)
+                    print(colors.yellow + m.title_formated + "No updates available." + colors.none)
             if (options[0] == "terse"):
                 pass
             elif (options[0] == "list"):
@@ -206,9 +212,9 @@ if (command == "check"):
         managers[manager].check()
         if (options[0] == "terse") or (options[0] == "list"):
             if (managers[manager].check_code == 8):
-                print(colors.green + managers[manager].get_title_formated() + "Updates available." + colors.none)
+                print(colors.green + managers[manager].title_formated + "Updates available." + colors.none)
             else:
-                print(colors.yellow + managers[manager].get_title_formated() + "No updates available." + colors.none)
+                print(colors.yellow + managers[manager].title_formated + "No updates available." + colors.none)
         if (options[0] == "terse"):
             pass
         elif (options[0] == "list"):
