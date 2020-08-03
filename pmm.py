@@ -8,7 +8,7 @@ import util
 import colors
 
 # Globals
-VERSION="0.4"
+VERSION="0.5"
 DEBUG=False
 HELP=colors.bold + "Package Manager Manager" + colors.none + "\n\
 \n\
@@ -73,10 +73,13 @@ if (len(sys.argv) > 1):
         if (len(sys.argv) > 2):
             options = sys.argv[2:]
 # Check default option
+if (manager == ""):
+    manager = "all"
 if (command == ""):
     command = "update"
 if DEBUG:
     print("M: '%s', C: '%s', O: %s" % (manager, command, options))
+    print("Config: " + util.get_config_dir())
 
 
 
@@ -98,10 +101,10 @@ if (command == "setup"):
     print("Enable any managers you want to use.")
     print()
     for m in managers:
-        if util.ask("Enable " + managers[m].get_title()):
+        if util.ask("Enable " + managers[m].title):
             managers[m].enable()
         else:
-            if util.ask("Disable " + managers[m].get_title()):
+            if util.ask("Disable " + managers[m].title):
                 managers[m].disable()
     print()
     print("PMM is now configured.")
@@ -110,22 +113,17 @@ if (command == "setup"):
 # Print status of all manager (config file)
 #   Print status for indivigual managers? when we get more complex configs?
 if (command == "status"):
-    for m in managers:
-        state = managers[m].config_state
-        if (state == 1):
-            print(colors.green, end='')
-            print("%-8s : Enabled" % (managers[m].get_title()))
-        elif (state == 0):
-            print(colors.red, end='')
-            print("%-8s : None" % (managers[m].get_title()))
-        elif (state == -1):
-            print(colors.yellow, end='')
-            print("%-8s : Disabled" % (managers[m].get_title()))
-        print(colors.none, end='')
+    for m in managers.values():
+        if (m.config_state == 1):
+            print(colors.green + m.title_formated + "Enabled" + colors.none)
+        elif (m.config_state == 0):
+            print(colors.red + m.title_formated + "None" + colors.none)
+        elif (m.config_state == -1):
+            print(colors.yellow + m.title_formated + "Disabled" + colors.none)
     sys.exit(0)
 # Enable specific manager, or enter interactive enabler
 if (command == "enable"):
-    if (manager == ""):
+    if (manager == "all"):
         for m in managers:
             if (len(options) > 0) and (options[0] == "auto"):
                 managers[m].enable()
@@ -133,18 +131,18 @@ if (command == "enable"):
                 if managers[m].ready():
                     managers[m].enable()
                 else:
-                    if util.ask("Enable " + managers[m].get_title()):
+                    if util.ask("Enable " + managers[m].title):
                         managers[m].enable()
     else:
         if (len(options) > 0) and (options[0] == "ask"):
-            if util.ask("Enable " + managers[manager].get_title()):
+            if util.ask("Enable " + managers[manager].title):
                 managers[manager].enable()
         else:
             managers[manager].enable()
     sys.exit(0)
 # Disable specific manager, or enter interactive disabler
 if (command == "disable"):
-    if (manager == ""):
+    if (manager == "all"):
         for m in managers:
             if (len(options) > 0) and (options[0] == "auto"):
                 managers[m].disable()
@@ -152,11 +150,11 @@ if (command == "disable"):
                 if (managers[m].config_state == -1):
                     managers[m].disable()
                 else:
-                    if util.ask("Disable " + managers[m].get_title()):
+                    if util.ask("Disable " + managers[m].title):
                         managers[m].disable()
     else:
         if (len(options) > 0) and (options[0] == "ask"):
-            if util.ask("Disable " + managers[manager].get_title()):
+            if util.ask("Disable " + managers[manager].title):
                 managers[manager].disable()
         else:
             managers[manager].disable()
@@ -167,7 +165,7 @@ if (command == "disable"):
 unconfigured = False
 for m in managers:
     if (managers[m].config_state == 0):
-        print(colors.red + "Error: " + managers[m].get_title() + " must be enabled or disabled before use." + colors.none)
+        print(colors.red + "Error: " + managers[m].title + " must be enabled or disabled before use." + colors.none)
         unconfigured = True
 if unconfigured:
     sys.exit(1)
@@ -182,7 +180,7 @@ if "dnf" in managers and "yum" in managers:
 if (command == "check"):
     if (len(options) == 0):
         options = ["list"]
-    if (manager == ""):
+    if (manager == "all"):
         fin = 0
         count = 0
         for m in managers.values():
@@ -208,6 +206,7 @@ if (command == "check"):
                 count += len(m.check_text)
             else:
                 print(colors.red + "Error: unkown check subcommand '" + options[0] + "'" + colors.none)
+                sys.exit(1)
         if (options[0] == "count"):
             print(count)
         sys.exit(fin)
@@ -228,6 +227,7 @@ if (command == "check"):
             print(len(managers[manager].check_text))
         else:
             print(colors.red + "Error: unkown check subcommand '" + options[0] + "'" + colors.none)
+            sys.exit(1)
         sys.exit(managers[manager].check_code)
 
 
