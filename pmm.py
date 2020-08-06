@@ -36,13 +36,14 @@ Commands:\n\
     ask       : (Default when manager is all) Ask before disabling\n\
     auto      : (Default when manager specified) Do not ask before disabling\n\
 \n\
-  check     : Check for updates, return code is 8 when updates are available\n\
+  check     : (Defualt) Check for updates, return code is 8 when updates are available\n\
     silent    : Print nothing, for using only the return code\n\
     terse     : Print only if updates were found or not\n\
     list      : (Default) Print if updates were found and lists of packages\n\
     count     : Print the number of packages to update (0 for no updates)\n\
 \n\
-  update    : (Default) Upcoming"
+  update    : !!Unimplemented!!"
+
 
 # Import Managers
 managers = {}
@@ -61,22 +62,22 @@ if util.has_cmd("flatpak"):
 manager=""
 command=""
 options=[]
-if (len(sys.argv) > 1):
-    if sys.argv[1] in managers or (sys.argv[1] == "all"):
-        manager = sys.argv[1]
-        if (len(sys.argv) > 2):
-            command = sys.argv[2]
+if (len(sys.argv) > 2):
+    if sys.argv[2] in managers or (sys.argv[2] == "all"):
+        manager = sys.argv[2]
+        if (len(sys.argv) > 3):
+            command = sys.argv[4]
+        if (len(sys.argv) > 4):
+            options = sys.argv[4:]
+    else:
+        command = sys.argv[2]
         if (len(sys.argv) > 3):
             options = sys.argv[3:]
-    else:
-        command = sys.argv[1]
-        if (len(sys.argv) > 2):
-            options = sys.argv[2:]
 # Check default option
 if (manager == ""):
     manager = "all"
 if (command == ""):
-    command = "update"
+    command = "check"
 if DEBUG:
     print("M: '%s', C: '%s', O: %s" % (manager, command, options))
     print("Config: " + util.get_config_dir())
@@ -114,11 +115,12 @@ if (command == "setup"):
 #   Print status for indivigual managers? when we get more complex configs?
 if (command == "status"):
     for m in managers.values():
-        if (m.config_state == 1):
+        state = m.config_state
+        if (state == 1):
             print(colors.green + m.title_formated + "Enabled" + colors.none)
-        elif (m.config_state == 0):
+        elif (state == 0):
             print(colors.red + m.title_formated + "None" + colors.none)
-        elif (m.config_state == -1):
+        elif (state == -1):
             print(colors.yellow + m.title_formated + "Disabled" + colors.none)
     sys.exit(0)
 # Enable specific manager, or enter interactive enabler
@@ -233,8 +235,20 @@ if (command == "check"):
 
 # Update packages
 if (command == "update"):
-    print(colors.violet + "Unimplemented $ pmm update" + colors.none)
-    sys.exit(1)
+    print(colors.violet + "!!Unimplemented 'update'!!" + colors.none)
+    if not DEBUG:
+        sys.exit(1)
+    if not util.is_sudo():
+        print(colors.red + "Error: This command must be run with superuser privileges" + colors.none)
+        #sys.exit(1)
+    if (manager == "all"):
+        for m in managers.values():
+            if (m.config_state < 1):
+                continue
+            m.update()
+    else:
+        managers[manager].update()
+    sys.exit(0)
 
 # Error out if command is not found
 print(colors.red + "Error: Unknown command '" + command + "'" + colors.none)
