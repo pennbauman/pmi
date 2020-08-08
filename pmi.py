@@ -1,6 +1,6 @@
-# Package Manager Manager
+# Package Manager Investigator
 #   Penn Bauman (pennbauman@protonmail.com)
-#   https://github.com/pennbauman/pmm
+#   https://github.com/pennbauman/pmi
 import sys
 import os
 
@@ -10,10 +10,11 @@ import colors
 # Globals
 VERSION="0.5"
 DEBUG=False
-HELP=colors.bold + "Package Manager Manager" + colors.none + "\n\
+Investigator
+HELP=colors.bold + "Package Manager Investigator" + colors.none + "\n\
 \n\
 Usage:\n\
-  pmm [manager] [command] [subcommand]\n\
+  pmi [manager] [command] [subcommand]\n\
 \n\
 Managers:\n\
   all       : (Default) Run command for all mangers\n\
@@ -26,7 +27,7 @@ Commands:\n\
     number    : Print only the version number\n\
 \n\
   help      : Print this help menu\n\
-  setup     : Setup PMM and enable or disable managers\n\
+  setup     : Setup PMI and enable or disable managers\n\
   status    : Check the state of available managers\n\
   enable    : Enable the specified manager or picked managers\n\
     ask       : (Default when manager is all) Ask before enabling\n\
@@ -91,16 +92,16 @@ if (command == "version"):
     if (len(options) > 0) and (options[0] == "ask"):
         print(VERSION)
     else:
-        print("Package Manager Manager : v" + VERSION)
+        print("Package Manager Investigator : v" + VERSION)
     sys.exit(0)
 # Print Help Menu
 #   Varies based on manager?
-if (command == "help"):
+if (command == "help") or (command == "-help") or (command == "--help"):
     print(HELP)
     sys.exit(0)
 # Preform interactive setup
 if (command == "setup"):
-    print(colors.bold + "Package Manager Manager Setup" + colors.none)
+    print(colors.bold + "Package Manager Investigator Setup" + colors.none)
     print("Enable any managers you want to use.")
     print()
     for m in managers:
@@ -110,8 +111,8 @@ if (command == "setup"):
             if util.ask("Disable " + managers[m].title):
                 managers[m].disable()
     print()
-    print("PMM is now configured.")
-    print("If you need more information run 'pmm help'.")
+    print("PMI is now configured.")
+    print("If you need more information run 'pmi help'.")
     sys.exit(0)
 # Print status of all manager (config file)
 #   Print status for indivigual managers? when we get more complex configs?
@@ -236,4 +237,5 @@ if (command == "check"):
 
 # Error out if command is not found
 print(colors.red + "Error: Unknown command '" + command + "'" + colors.none)
+print("  For more information run 'pmi help'")
 sys.exit(1)

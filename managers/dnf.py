@@ -1,6 +1,6 @@
-# DNF - Package Manager Manager
+# DNF - Package Manager Investigator
 #   Penn Bauman (pennbauman@protonmail.com)
-#   https://github.com/pennbauman/pmm
+#   https://github.com/pennbauman/pmi
 import os
 import subprocess
 

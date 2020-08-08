@@ -1,16 +1,16 @@
-# Package Manager Manager
-A tool to allow managing packages form multiple package managers simultaneously.
+# Package Manager Investigator
+A tool to allow monitoring packages from multiple package managers simultaneously.
 
 ## Install & Configure
 Requires root access:
 
 	./install.sh
 
-	pmm setup
+	pmi setup
 
 ## Use
 
-	pmm [manager] [command] [subcommand]
+	pmi [manager] [command] [subcommand]
 
 ### Managers
 - [DNF](https://fedoraproject.org/wiki/DNF)
@@ -28,7 +28,7 @@ Generally if a manager is not specified all are used.
 
 - `help` Print this help menu
 
-- `setup` Setup PMM and enable or disable managers
+- `setup` Setup PMI and enable or disable managers
 
 - `status` Check the state of available managers
 

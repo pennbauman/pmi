@@ -1,6 +1,6 @@
-# Manager Template - Package Manager Manager
+# Manager Template - Package Manager Investigator
 #   Penn Bauman (pennbauman@protonmail.com)
-#   https://github.com/pennbauman/pmm
+#   https://github.com/pennbauman/pmi
 import sys
 import os
 

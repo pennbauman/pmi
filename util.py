@@ -1,6 +1,6 @@
-# Utility - Package Manager Manager
+# Utility - Package Manager Investigator
 #   Penn Bauman (pennbauman@protonmail.com)
-#   https://github.com/pennbauman/pmm
+#   https://github.com/pennbauman/pmi
 import sys
 import os
 import subprocess
@@ -17,10 +17,10 @@ def has_cmd(command):
 
 def get_config_dir():
     try:
-        config_dir = os.environ['XDG_CONFIG_HOME'] + "/pmm"
+        config_dir = os.environ['XDG_CONFIG_HOME'] + "/pmi"
     except:
         try:
-            config_dir = os.environ['HOME'] + "/.config/pmm"
+            config_dir = os.environ['HOME'] + "/.config/pmi"
         except:
             print(colors.red + "Error: $HOME cannot be determined" + colors.none)
             sys.exit(1)

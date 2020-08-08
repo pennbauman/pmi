@@ -1,6 +1,6 @@
 # Colors
 #   Penn Bauman (pennbauman@protonmail.com)
-#   https://github.com/pennbauman/pmm
+#   https://github.com/pennbauman/pmi
 none = '\33[0m'
 
 bold = '\33[1m'
