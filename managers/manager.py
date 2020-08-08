@@ -77,10 +77,3 @@ class manager:
     def check(self):
         print(colors.violet + self.title + ": check_run() unimplemented" + colors.none)
         sys.exit(1)
-
-
-    # Preform updates
-    def update(self):
-        self.enabled_error()
-        print(colors.violet + self.title + ": update() unimplemented" + colors.none)
-        sys.exit(1)

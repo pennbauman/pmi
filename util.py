@@ -16,7 +16,6 @@ def has_cmd(command):
     return os.system("command -v " + command + "&> /dev/null") == 0
 
 def get_config_dir():
-    return sys.argv[1]
     try:
         config_dir = os.environ['XDG_CONFIG_HOME'] + "/pmm"
     except:

@@ -36,13 +36,14 @@ Commands:\n\
     ask       : (Default when manager is all) Ask before disabling\n\
     auto      : (Default when manager specified) Do not ask before disabling\n\
 \n\
-  check     : (Defualt) Check for updates, return code is 8 when updates are available\n\
+  check     : (Defualt) Check for updates, return code is 8 when updates are\n\
+              available\n\
     silent    : Print nothing, for using only the return code\n\
-    terse     : Print only if updates were found or not\n\
-    list      : (Default) Print if updates were found and lists of packages\n\
-    count     : Print the number of packages to update (0 for no updates)\n\
-\n\
-  update    : !!Unimplemented!!"
+    terse     : (Default if check is not specified) Print only if updates were\n\
+                found or not\n\
+    list      : (Default otherwise) Print if updates were found and lists of\n\
+                packages\n\
+    count     : Print the number of packages to update (0 for no updates)"
 
 
 # Import Managers
@@ -62,22 +63,23 @@ if util.has_cmd("flatpak"):
 manager=""
 command=""
 options=[]
-if (len(sys.argv) > 2):
-    if sys.argv[2] in managers or (sys.argv[2] == "all"):
-        manager = sys.argv[2]
-        if (len(sys.argv) > 3):
-            command = sys.argv[4]
-        if (len(sys.argv) > 4):
-            options = sys.argv[4:]
-    else:
-        command = sys.argv[2]
+if (len(sys.argv) > 1):
+    if sys.argv[1] in managers or (sys.argv[1] == "all"):
+        manager = sys.argv[1]
+        if (len(sys.argv) > 2):
+            command = sys.argv[3]
         if (len(sys.argv) > 3):
             options = sys.argv[3:]
+    else:
+        command = sys.argv[1]
+        if (len(sys.argv) > 2):
+            options = sys.argv[2:]
 # Check default option
 if (manager == ""):
     manager = "all"
 if (command == ""):
     command = "check"
+    options = ["terse"]
 if DEBUG:
     print("M: '%s', C: '%s', O: %s" % (manager, command, options))
     print("Config: " + util.get_config_dir())
@@ -231,24 +233,6 @@ if (command == "check"):
             print(colors.red + "Error: unkown check subcommand '" + options[0] + "'" + colors.none)
             sys.exit(1)
         sys.exit(managers[manager].check_code)
-
-
-# Update packages
-if (command == "update"):
-    print(colors.violet + "!!Unimplemented 'update'!!" + colors.none)
-    if not DEBUG:
-        sys.exit(1)
-    if not util.is_sudo():
-        print(colors.red + "Error: This command must be run with superuser privileges" + colors.none)
-        #sys.exit(1)
-    if (manager == "all"):
-        for m in managers.values():
-            if (m.config_state < 1):
-                continue
-            m.update()
-    else:
-        managers[manager].update()
-    sys.exit(0)
 
 # Error out if command is not found
 print(colors.red + "Error: Unknown command '" + command + "'" + colors.none)
