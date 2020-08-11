@@ -6,6 +6,7 @@ import subprocess
 
 import colors
 from managers.manager import manager
+from package import package
 
 class flatpak(manager):
     title="Flatpak"
@@ -22,5 +23,7 @@ class flatpak(manager):
             text = cmd.stdout.decode("utf-8").split("\n")
             i=3
             while (i < len(text)-3):
-                self.check_text.append(text[i].split()[1])
+                line = text[i].split()
+                na = colors.violet + "N/A" + colors.none
+                self.check_text.append(package(line[1], self.name, na, na))
                 i += 1

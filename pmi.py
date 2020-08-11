@@ -44,8 +44,8 @@ Commands:\n\
     silent    : Print nothing, for using only the return code\n\
     terse     : Print only if updates were found or not\n\
     list      : (Default) Print a lists of out of date packages\n\
-      formatted : (Default) Print manager heads and the list packages\n\
-      plain     : Print only this of packages\n\
+      formatted : (Default) Print manager headers and packages information\n\
+      plain     : Print only the list of packages\n\
     count     : Print the number of packages to update (0 for no updates)"
 
 
@@ -232,10 +232,10 @@ if (args[0] == "check"):
             if (args[2] == "silent"):
                 pass
             elif (args[2] == "terse"):
-                manager.check_print(m.title_formated, (m.check_code == 8))
+                m.check_print(False)
             elif (args[2] == "list"):
                 if (args[3] == "formatted"):
-                    manager.check_print(m.title_formated, (m.check_code == 8), m.check_text)
+                    m.check_print()
                 elif (args[3] == "plain"):
                     if (m.check_code == 8):
                         for p in m.check_text:
@@ -254,10 +254,12 @@ if (args[0] == "check"):
         managers[args[1]].check()
 
         if (args[2] == "terse"):
-            manager.check_print(managers[args[1]].title_formated, (managers[args[1]].check_code == 8))
+            managers[args[1]].check_print(False)
+            #manager.check_print(managers[args[1]].title_formated, (managers[args[1]].check_code == 8))
         elif (args[2] == "list"):
             if (args[3] == "formatted"):
-                manager.check_print(managers[args[1]].title_formated, (managers[args[1]].check_code == 8), managers[args[1]].check_text)
+                managers[args[1]].check_print()
+                #manager.check_print(managers[args[1]].title_formated, (managers[args[1]].check_code == 8), managers[args[1]].check_text)
             elif (args[3] == "plain"):
                 if (managers[args[1]].check_code == 8):
                     for p in managers[args[1]].check_text:

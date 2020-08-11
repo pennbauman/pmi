@@ -20,6 +20,7 @@ class manager:
     def __init__(self):
         self.check_code=-1
         self.check_text=[]
+        self.width = 0
         self.name = self.__class__.__name__
         self.title_formated = "{:<8} : ".format(self.title)
         # Check manager installed
@@ -79,11 +80,11 @@ class manager:
         sys.exit(1)
 
     # Print if updates are available and a list of updates if provided
-    def check_print(name, available, packages=[]):
-        if available:
-            print(colors.bold + colors.green + name + "Updates available." + colors.none)
+    def check_print(self, show_list=True):
+        if (self.check_code == 8):
+            print(colors.bold + colors.green + self.title_formated + "Updates available." + colors.none)
         else:
-            print(colors.bold + colors.yellow + name + "No updates available." + colors.none)
-
-        for p in packages:
-            print("  " + p)
+            print(colors.bold + colors.yellow + self.title_formated + "No updates available." + colors.none)
+        if show_list:
+            for p in self.check_text:
+                p.print_update(self.width)

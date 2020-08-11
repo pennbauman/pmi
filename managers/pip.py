@@ -6,6 +6,7 @@ import subprocess
 
 import colors
 from managers.manager import manager
+from package import package
 
 class pip(manager):
     title="pip"
@@ -22,5 +23,7 @@ class pip(manager):
             text = cmd.stdout.decode("utf-8").split("\n")
             i=2
             while (i < len(text)-1):
-                self.check_text.append(text[i].split()[0])
+                line = text[i].split()
+                self.check_text.append(package(line[0], self.name, line[1], line[2]))
+                self.width = max(self.width, len(line[0]))
                 i += 1

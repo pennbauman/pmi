@@ -6,6 +6,7 @@ import subprocess
 
 import colors
 from managers.manager import manager
+from package import package
 
 class yum(manager):
     title="Yum"
@@ -19,8 +20,19 @@ class yum(manager):
         else:
             self.check_code = 0
         if self.check_code:
-            text = cmd.stdout.decode("utf=8").split("\n")
+            pack_cmd = subprocess.run(["yum", "list", "installed"], capture_output=True)
+            pack_cmd = pack_cmd.stdout.decode("utf-8").split("\n")
+            pack_info = {}
+            i=1
+            while (i < len(pack_cmd)-1):
+                p = pack_cmd[i].split()
+                pack_info[p[0]] = p[1]
+                i += 1
+
+            text = cmd.stdout.decode("utf-8").split("\n")
             i=2
             while (i < len(text)-1):
-                self.check_text.append(text[i].split()[0])
+                line = text[i].split()
+                self.check_text.append(package(line[0], self.name, pack_info[line[0]], line[1]))
+                self.width = max(self.width, len(line[0]))
                 i += 1

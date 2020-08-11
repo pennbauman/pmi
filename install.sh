@@ -10,4 +10,5 @@ sudo mkdir -p $install_dir
 sudo cp pmi.py $install_dir
 sudo cp colors.py $install_dir
 sudo cp util.py $install_dir
+sudo cp package.py $install_dir
 sudo cp -r managers $install_dir
