@@ -6,9 +6,10 @@ import os
 
 import util
 import colors
+from managers.manager import manager
 
 # Globals
-VERSION="0.5"
+VERSION="0.6"
 DEBUG=False
 HELP=colors.bold + "Package Manager Investigator" + colors.none + "\n\
 \n\
@@ -58,45 +59,49 @@ if util.has_cmd("flatpak"):
 
 
 # Parse command line options
-manager=""
-command=""
-options=[]
+args=["", ""]
 if (len(sys.argv) > 1):
     if sys.argv[1] in managers or (sys.argv[1] == "all"):
-        manager = sys.argv[1]
+        args[1] = sys.argv[1]
         if (len(sys.argv) > 2):
-            command = sys.argv[3]
+            args[0] = sys.argv[2]
         if (len(sys.argv) > 3):
-            options = sys.argv[3:]
+            args = args + sys.argv[3:]
     else:
-        command = sys.argv[1]
+        args[0] = sys.argv[1]
         if (len(sys.argv) > 2):
-            options = sys.argv[2:]
+            args = args + sys.argv[2:]
 # Check default option
-if (manager == ""):
-    manager = "all"
-if (command == ""):
-    command = "check"
+if (args[1] == ""):
+    args[1] = "all"
+if (args[0] == ""):
+    args[0] = "check"
 if DEBUG:
-    print("M: '%s', C: '%s', O: %s" % (manager, command, options))
+    print("M: '%s', C: '%s', O: %s" % (args[1], args[0], args[2:]))
     print("Config: " + util.get_config_dir())
 
 
 
 # Print version
-if (command == "version"):
-    if (len(options) > 0) and (options[0] == "ask"):
+if (args[0] == "version"):
+    if (len(args) == 2):
+        args.append("message")
+    if (args[2] == "message"):
+        print("Package Manager Investigator : v" + VERSION)
+    elif (args[2] == "number"):
         print(VERSION)
     else:
-        print("Package Manager Investigator : v" + VERSION)
+        print(colors.red + "Error: unkown check subcommand '" + args[2] + "'" + colors.none)
     sys.exit(0)
+
 # Print Help Menu
 #   Varies based on manager?
-if (command == "help") or (command == "-help") or (command == "--help"):
+if (args[0] == "help") or (args[0] == "-help") or (args[0] == "--help"):
     print(HELP)
     sys.exit(0)
+
 # Preform interactive setup
-if (command == "setup"):
+if (args[0] == "setup"):
     print(colors.bold + "Package Manager Investigator Setup" + colors.none)
     print("Enable any managers you want to use.")
     print()
@@ -110,9 +115,10 @@ if (command == "setup"):
     print("PMI is now configured.")
     print("If you need more information run 'pmi help'.")
     sys.exit(0)
-# Print status of all manager (config file)
+
+# Print status of all managers (config file)
 #   Print status for indivigual managers? when we get more complex configs?
-if (command == "status"):
+if (args[0] == "status"):
     for m in managers.values():
         state = m.config_state
         if (state == 1):
@@ -123,42 +129,60 @@ if (command == "status"):
             print(colors.yellow + m.title_formated + "Disabled" + colors.none)
     sys.exit(0)
 # Enable specific manager, or enter interactive enabler
-if (command == "enable"):
-    if (manager == "all"):
+if (args[0] == "enable"):
+    if (args[1] == "all"):
+        if (len(args) == 2):
+            args.append("ask")
         for m in managers:
-            if (len(options) > 0) and (options[0] == "auto"):
+            if (args[2] == "auto"):
                 managers[m].enable()
-            else:
+            elif (args[2] == "ask"):
                 if managers[m].ready():
                     managers[m].enable()
                 else:
                     if util.ask("Enable " + managers[m].title):
                         managers[m].enable()
+
+            else:
+                print(colors.red + "Error: unkown check subcommand '" + args[2] + "'" + colors.none)
     else:
-        if (len(options) > 0) and (options[0] == "ask"):
-            if util.ask("Enable " + managers[manager].title):
-                managers[manager].enable()
+        if (len(args) == 2):
+            args.append("auto")
+        if (args[2] == "auto"):
+            managers[args[1]].enable()
+        elif (args[2] == "ask"):
+            if util.ask("Enable " + managers[args[1]].title):
+                managers[args[1]].enable()
         else:
-            managers[manager].enable()
+            print(colors.red + "Error: unkown check subcommand '" + args[2] + "'" + colors.none)
     sys.exit(0)
 # Disable specific manager, or enter interactive disabler
-if (command == "disable"):
-    if (manager == "all"):
+if (args[0] == "disable"):
+    if (args[1] == "all"):
+        if (len(args) == 2):
+            args.append("ask")
         for m in managers:
-            if (len(options) > 0) and (options[0] == "auto"):
+            if (args[2] == "auto"):
                 managers[m].disable()
-            else:
+            elif (args[2] == "ask"):
                 if (managers[m].config_state == -1):
                     managers[m].disable()
                 else:
                     if util.ask("Disable " + managers[m].title):
                         managers[m].disable()
+            else:
+                print(colors.red + "Error: unkown check subcommand '" + args[2] + "'" + colors.none)
     else:
-        if (len(options) > 0) and (options[0] == "ask"):
-            if util.ask("Disable " + managers[manager].title):
-                managers[manager].disable()
+        if (len(args) == 2):
+            args.append("auto")
+        if (args[2] == "auto"):
+            managers[args[1]].disable()
+        elif (args[2] == "ask"):
+            if util.ask("Disable " + managers[args[1]].title):
+                managers[args[1]].disable()
         else:
-            managers[manager].disable()
+            print(colors.red + "Error: unkown check subcommand '" + args[2] + "'" + colors.none)
+
     sys.exit(0)
 
 
@@ -174,14 +198,14 @@ if unconfigured:
 # Check if duplicate managers are inabled
 if "dnf" in managers and "yum" in managers:
     if (managers["yum"].config_state == 1) and (managers["yum"].config_state == 1):
-        print(colors.yellow + "Warning: Both Yum and DNF installed, will be duplicates." + colors.none)
+        print(colors.yellow + "Warning: Both Yum and DNF installed, they will act as duplicates." + colors.none)
 
 
 # Check for available updates
-if (command == "check"):
-    if (len(options) == 0):
-        options = ["list"]
-    if (manager == "all"):
+if (args[0] == "check"):
+    if (len(args) == 2):
+        args.append("list")
+    if (args[1] == "all"):
         fin = 0
         count = 0
         for m in managers.values():
@@ -190,48 +214,35 @@ if (command == "check"):
             result = m.check()
             if (m.check_code == 8):
                 fin = 8
-            if (options[0] == "terse") or (options[0] == "list"):
-                if (m.check_code == 8):
-                    print(colors.green + m.title_formated + "Updates available." + colors.none)
-                else:
-                    print(colors.yellow + m.title_formated + "No updates available." + colors.none)
-            if (options[0] == "silent"):
+            if (args[2] == "silent"):
                 pass
-            elif (options[0] == "terse"):
-                pass
-            elif (options[0] == "list"):
-                if (m.check_code == 8):
-                    for p in m.check_text:
-                        print("  " + p)
-            elif (options[0] == "count"):
+            elif (args[2] == "terse"):
+                manager.check_print(m.title_formated, (m.check_code == 8))
+            elif (args[2] == "list"):
+                manager.check_print(m.title_formated, (m.check_code == 8), m.check_text)
+            elif (args[2] == "count"):
                 count += len(m.check_text)
             else:
-                print(colors.red + "Error: unkown check subcommand '" + options[0] + "'" + colors.none)
+                print(colors.red + "Error: unkown check subcommand '" + args[2] + "'" + colors.none)
                 sys.exit(1)
-        if (options[0] == "count"):
+        if (args[2] == "count"):
             print(count)
         sys.exit(fin)
     else:
-        managers[manager].check()
-        if (options[0] == "terse") or (options[0] == "list"):
-            if (managers[manager].check_code == 8):
-                print(colors.green + managers[manager].title_formated + "Updates available." + colors.none)
-            else:
-                print(colors.yellow + managers[manager].title_formated + "No updates available." + colors.none)
-        if (options[0] == "terse"):
-            pass
-        elif (options[0] == "list"):
-            if (managers[manager].check_code == 8):
-                for p in managers[manager].check_text:
-                    print("  " + p)
-        elif (options[0] == "count"):
-            print(len(managers[manager].check_text))
+        managers[args[1]].check()
+
+        if (args[2] == "terse"):
+            manager.check_print(managers[args[1]].title_formated, (managers[args[1]].check_code == 8))
+        elif (args[2] == "list"):
+            manager.check_print(managers[args[1]].title_formated, (managers[args[1]].check_code == 8), managers[args[1]].check_text)
+        elif (args[2] == "count"):
+            print(len(managers[args[1]].check_text))
         else:
-            print(colors.red + "Error: unkown check subcommand '" + options[0] + "'" + colors.none)
+            print(colors.red + "Error: unkown check subcommand '" + args[2] + "'" + colors.none)
             sys.exit(1)
-        sys.exit(managers[manager].check_code)
+        sys.exit(managers[args[1]].check_code)
 
 # Error out if command is not found
-print(colors.red + "Error: Unknown command '" + command + "'" + colors.none)
+print(colors.red + "Error: Unknown command '" + args[0] + "'" + colors.none)
 print("  For more information run 'pmi help'")
 sys.exit(1)

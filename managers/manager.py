@@ -77,3 +77,15 @@ class manager:
     def check(self):
         print(colors.violet + self.title + ": check_run() unimplemented" + colors.none)
         sys.exit(1)
+
+    # Print if updates are available and a list of updates if provided
+    def check_print(name, available, packages=[]):
+        if available:
+            print(colors.bold + colors.green + name + "Updates available." + colors.none)
+        else:
+            print(colors.bold + colors.yellow + name + "No updates available." + colors.none)
+
+        for p in packages:
+            print("  " + p)
+        if (len(packages) > 0):
+            print()
