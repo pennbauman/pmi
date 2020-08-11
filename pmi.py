@@ -9,7 +9,7 @@ import colors
 from managers.manager import manager
 
 # Globals
-VERSION="0.6"
+VERSION="0.7"
 DEBUG=False
 HELP=colors.bold + "Package Manager Investigator" + colors.none + "\n\
 \n\
@@ -20,6 +20,8 @@ Managers:\n\
   all       : (Default) Run command for all mangers\n\
   dnf       : Fedora DNF\n\
   flatpak   : Flatpak\n\
+  npm       : Node.js package manager\n\
+  pip       : Python package manager\n\
 \n\
 Commands:\n\
   version   : Print version number\n\
@@ -49,15 +51,24 @@ Commands:\n\
 
 # Import Managers
 managers = {}
+# System package managers
 if util.has_cmd("dnf"):
     from managers.dnf import dnf
     managers['dnf'] = dnf()
 if util.has_cmd("yum"):
     from managers.yum import yum
     managers['yum'] = yum()
+# Sandboxed package managers
 if util.has_cmd("flatpak"):
     from managers.flatpak import flatpak
     managers['flatpak'] = flatpak()
+# Language package managers
+if util.has_cmd("npm"):
+    from managers.npm import npm
+    managers['npm'] = npm()
+if util.has_cmd("pip"):
+    from managers.pip import pip
+    managers['pip'] = pip()
 
 
 # Parse command line options

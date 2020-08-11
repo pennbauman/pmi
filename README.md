@@ -19,6 +19,10 @@ Requires root access:
 
 - [Flatpak](https://www.flatpak.org/)
 
+- [npm](https://www.npmjs.com/)
+
+- [pip](https://pypi.org/project/pip/)
+
 Generally if a manager is not specified all are used.
 
 ### Commands & Subcommands
