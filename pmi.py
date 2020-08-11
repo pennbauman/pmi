@@ -10,7 +10,6 @@ import colors
 # Globals
 VERSION="0.5"
 DEBUG=False
-Investigator
 HELP=colors.bold + "Package Manager Investigator" + colors.none + "\n\
 \n\
 Usage:\n\
@@ -40,10 +39,8 @@ Commands:\n\
   check     : (Defualt) Check for updates, return code is 8 when updates are\n\
               available\n\
     silent    : Print nothing, for using only the return code\n\
-    terse     : (Default if check is not specified) Print only if updates were\n\
-                found or not\n\
-    list      : (Default otherwise) Print if updates were found and lists of\n\
-                packages\n\
+    terse     : Print only if updates were found or not\n\
+    list      : (Default) Print if updates were found and lists of packages\n\
     count     : Print the number of packages to update (0 for no updates)"
 
 
@@ -80,7 +77,6 @@ if (manager == ""):
     manager = "all"
 if (command == ""):
     command = "check"
-    options = ["terse"]
 if DEBUG:
     print("M: '%s', C: '%s', O: %s" % (manager, command, options))
     print("Config: " + util.get_config_dir())
