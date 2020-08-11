@@ -19,7 +19,7 @@ class dnf(manager):
         else:
             self.check_code = 0
         if self.check_code:
-            text = cmd.stdout.decode("utf=8").split("\n")
+            text = cmd.stdout.decode("utf-8").split("\n")
             i=2
             while (i < len(text)-1):
                 self.check_text.append(text[i].split()[0])

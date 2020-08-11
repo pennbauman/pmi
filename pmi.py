@@ -41,7 +41,9 @@ Commands:\n\
               available\n\
     silent    : Print nothing, for using only the return code\n\
     terse     : Print only if updates were found or not\n\
-    list      : (Default) Print if updates were found and lists of packages\n\
+    list      : (Default) Print a lists of out of date packages\n\
+      formatted : (Default) Print manager heads and the list packages\n\
+      plain     : Print only this of packages\n\
     count     : Print the number of packages to update (0 for no updates)"
 
 
@@ -91,7 +93,7 @@ if (args[0] == "version"):
     elif (args[2] == "number"):
         print(VERSION)
     else:
-        print(colors.red + "Error: unkown check subcommand '" + args[2] + "'" + colors.none)
+        print(colors.red + "Error: unkown 'version' subcommand '" + args[2] + "'" + colors.none)
     sys.exit(0)
 
 # Print Help Menu
@@ -144,7 +146,7 @@ if (args[0] == "enable"):
                         managers[m].enable()
 
             else:
-                print(colors.red + "Error: unkown check subcommand '" + args[2] + "'" + colors.none)
+                print(colors.red + "Error: unkown 'enable' subcommand '" + args[2] + "'" + colors.none)
     else:
         if (len(args) == 2):
             args.append("auto")
@@ -154,7 +156,7 @@ if (args[0] == "enable"):
             if util.ask("Enable " + managers[args[1]].title):
                 managers[args[1]].enable()
         else:
-            print(colors.red + "Error: unkown check subcommand '" + args[2] + "'" + colors.none)
+            print(colors.red + "Error: unkown 'enable' subcommand '" + args[2] + "'" + colors.none)
     sys.exit(0)
 # Disable specific manager, or enter interactive disabler
 if (args[0] == "disable"):
@@ -171,7 +173,7 @@ if (args[0] == "disable"):
                     if util.ask("Disable " + managers[m].title):
                         managers[m].disable()
             else:
-                print(colors.red + "Error: unkown check subcommand '" + args[2] + "'" + colors.none)
+                print(colors.red + "Error: unkown 'disable' subcommand '" + args[2] + "'" + colors.none)
     else:
         if (len(args) == 2):
             args.append("auto")
@@ -181,7 +183,7 @@ if (args[0] == "disable"):
             if util.ask("Disable " + managers[args[1]].title):
                 managers[args[1]].disable()
         else:
-            print(colors.red + "Error: unkown check subcommand '" + args[2] + "'" + colors.none)
+            print(colors.red + "Error: unkown 'disable' subcommand '" + args[2] + "'" + colors.none)
 
     sys.exit(0)
 
@@ -205,6 +207,8 @@ if "dnf" in managers and "yum" in managers:
 if (args[0] == "check"):
     if (len(args) == 2):
         args.append("list")
+    if (args[2] == "list") and (len(args) == 3):
+        args.append("formatted")
     if (args[1] == "all"):
         fin = 0
         count = 0
@@ -219,11 +223,18 @@ if (args[0] == "check"):
             elif (args[2] == "terse"):
                 manager.check_print(m.title_formated, (m.check_code == 8))
             elif (args[2] == "list"):
-                manager.check_print(m.title_formated, (m.check_code == 8), m.check_text)
+                if (args[3] == "formatted"):
+                    manager.check_print(m.title_formated, (m.check_code == 8), m.check_text)
+                elif (args[3] == "plain"):
+                    if (m.check_code == 8):
+                        for p in m.check_text:
+                            print(p)
+                else:
+                    print(colors.red + "Error: unkown 'check list' subcommand '" + args[3] + "'" + colors.none)
             elif (args[2] == "count"):
                 count += len(m.check_text)
             else:
-                print(colors.red + "Error: unkown check subcommand '" + args[2] + "'" + colors.none)
+                print(colors.red + "Error: unkown 'check' subcommand '" + args[2] + "'" + colors.none)
                 sys.exit(1)
         if (args[2] == "count"):
             print(count)
@@ -234,11 +245,18 @@ if (args[0] == "check"):
         if (args[2] == "terse"):
             manager.check_print(managers[args[1]].title_formated, (managers[args[1]].check_code == 8))
         elif (args[2] == "list"):
-            manager.check_print(managers[args[1]].title_formated, (managers[args[1]].check_code == 8), managers[args[1]].check_text)
+            if (args[3] == "formatted"):
+                manager.check_print(managers[args[1]].title_formated, (managers[args[1]].check_code == 8), managers[args[1]].check_text)
+            elif (args[3] == "plain"):
+                if (managers[args[1]].check_code == 8):
+                    for p in managers[args[1]].check_text:
+                        print(p)
+            else:
+                print(colors.red + "Error: unkown 'check list' subcommand '" + args[3] + "'" + colors.none)
         elif (args[2] == "count"):
             print(len(managers[args[1]].check_text))
         else:
-            print(colors.red + "Error: unkown check subcommand '" + args[2] + "'" + colors.none)
+            print(colors.red + "Error: unkown 'check' subcommand '" + args[2] + "'" + colors.none)
             sys.exit(1)
         sys.exit(managers[args[1]].check_code)
 

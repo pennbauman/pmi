@@ -87,5 +87,3 @@ class manager:
 
         for p in packages:
             print("  " + p)
-        if (len(packages) > 0):
-            print()

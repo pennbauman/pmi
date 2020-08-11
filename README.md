@@ -43,7 +43,9 @@ Generally if a manager is not specified all are used.
 - `check` (Default) Check for updates, return code is 8 when updates are available
     - `silent` Print nothing, for using only the return code
     - `terse` Print only if updates were found or not
-    - `list` (Default) Print if updates were found and lists of packages
+    - `list` (Default) Print a lists of out of date packages
+        - `formatted` (Default) Print manager heads and the list packages
+        - `plain` Print only this of packages
     - `count` Print the number of packages to update (0 for no updates)
 
 If a command or subcommand is not specified the default is used.

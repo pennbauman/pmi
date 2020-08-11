@@ -19,7 +19,7 @@ class flatpak(manager):
         else:
             self.check_code = 0
         if self.check_code:
-            text = cmd.stdout.decode("utf=8").split("\n")
+            text = cmd.stdout.decode("utf-8").split("\n")
             i=3
             while (i < len(text)-3):
                 self.check_text.append(text[i].split()[1])
