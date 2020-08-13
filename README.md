@@ -10,7 +10,7 @@ Requires root access:
 
 ## Use
 
-	pmi [manager] [command] [subcommand]
+	pmi [manager] [command] [options]
 
 ### Managers
 - [DNF](https://fedoraproject.org/wiki/DNF)
@@ -23,33 +23,35 @@ Requires root access:
 
 - [pip](https://pypi.org/project/pip/)
 
-Generally if a manager is not specified all are used.
+If a manager is not specified all are used.
 
-### Commands & Subcommands
-- `version` Print version number
-    - `message` (Default) Print message with number
-    - `number` Print only the version number
+### Commands
 
-- `help` Print this help menu
+`version` Print version number. Accepts `--full` and `--plain`, `--full` is the default.
 
-- `setup` Setup PMI and enable or disable managers
+`help` Print a help menu. Accepts no options.
 
-- `status` Check the state of available managers
+`setup` Setup PMI and enable or disable managers. Accepts no options.
 
-- `enable` Enable the specified manager or picked managers
-    - `ask` (Default when manager is all) Ask before enabling
-    - `auto` (Default when manager specified) Do not ask before enabling
+`status` Check the state of available managers. Accepts no options.
 
-- `disable` Disable the specified manager or picked managers
-    - `ask` (Default when manager is all) Ask before disabling
-    - `auto`(Default when manager specified) Do not ask before disabling
+`enable` Enable the specified manager or selected managers. Accepts `--ask` and `--yes` options, `--ask` is the default when a manager is not specified, `--yes` is the default otherwise.
 
-- `check` (Default) Check for updates, return code is 8 when updates are available
-    - `silent` Print nothing, for using only the return code
-    - `terse` Print only if updates were found or not
-    - `list` (Default) Print a lists of out of date packages
-        - `formatted` (Default) Print manager heads and the list packages
-        - `plain` Print only this of packages
-    - `count` Print the number of packages to update (0 for no updates)
+`disable` Disable the specified manager or selected managers. Accepts `--ask` and `--yes` options, `--ask` is the default when a manager is not specified, `--yes` is the default otherwise.
 
-If a command or subcommand is not specified the default is used.
+`check` Check for updates, the return code is 8 when updates are available. Accepts with `--full`, `--plain`, `--silent`, and `--count` options, `--full` is the default.
+
+If no command is not specified `check` is run.
+
+### Options
+`-a`, `--ask` Ask before preforming changes.
+
+`-y`, `--yes` Preform requested changes without asking.
+
+`-f`, `--full` Print full output with format.
+
+`-p`, `--plain` Print simplified output without formatting.
+
+`-s`, `--silent` Print nothing, useful to get return codes.
+
+`-c`, `--count` Print only the count of packages.

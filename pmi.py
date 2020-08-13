@@ -9,44 +9,51 @@ import colors
 from managers.manager import manager
 
 # Globals
-VERSION="0.7"
+VERSION="0.8"
 DEBUG=False
 HELP=colors.bold + "Package Manager Investigator" + colors.none + "\n\
-\n\
 Usage:\n\
-  pmi [manager] [command] [subcommand]\n\
+  pmi [manager] [command] [options]\n\
 \n\
-Managers:\n\
-  all       : (Default) Run command for all mangers\n\
-  dnf       : Fedora DNF\n\
-  flatpak   : Flatpak\n\
-  npm       : Node.js package manager\n\
-  pip       : Python package manager\n\
+Package Managers:\n\
+  all          : Run command for all mangers, this the default\n\
+  dnf          : DNF for Fedora, CentOS, and RHEL\n\
+  yum          : Yum for Fedora, CentOS, and RHEL\n\
+  flatpak      : Flatpak\n\
+  npm          : Node.js package manager\n\
+  pip          : Python package manager\n\
 \n\
 Commands:\n\
-  version   : Print version number\n\
-    message   : (Default) Print message with number\n\
-    number    : Print only the version number\n\
+  version      : Print version number\n\
+                  Accepts --full and --plain\n\
+                  --full is the default\n\
+  help         : Print this help menu\n\
+                  Accepts no options\n\
+  setup        : Setup PMI and enable or disable managers\n\
+                  Accepts no options\n\
+  status       : Check the state of available managers\n\
+                  Accepts no options\n\
+  enable       : Enable the specified manager or selected managers\n\
+                  Accepts --ask and --yes options\n\
+                  --ask is the default when a manager is not specified\n\
+                  --yes is the default otherwise\n\
+  disable      : Disable the specified manager or selected managers\n\
+                  Accepts --ask and --yes options\n\
+                  --ask is the default when a manager is not specified\n\
+                  --yes is the default otherwise\n\
+  check        : Check for updates, the return code is 8 when updates are available\n\
+                  This command is fun if no command is specified\n\
+                  Accepts with --full, --plain, --silent, and --count options\n\
+                  --full is the default\n\
 \n\
-  help      : Print this help menu\n\
-  setup     : Setup PMI and enable or disable managers\n\
-  status    : Check the state of available managers\n\
-  enable    : Enable the specified manager or picked managers\n\
-    ask       : (Default when manager is all) Ask before enabling\n\
-    auto      : (Default when manager specified) Do not ask before enabling\n\
-\n\
-  disable   : Disable the specified manager or picked managers\n\
-    ask       : (Default when manager is all) Ask before disabling\n\
-    auto      : (Default when manager specified) Do not ask before disabling\n\
-\n\
-  check     : (Defualt) Check for updates, return code is 8 when updates are\n\
-              available\n\
-    silent    : Print nothing, for using only the return code\n\
-    terse     : Print only if updates were found or not\n\
-    list      : (Default) Print a lists of out of date packages\n\
-      formatted : (Default) Print manager headers and packages information\n\
-      plain     : Print only the list of packages\n\
-    count     : Print the number of packages to update (0 for no updates)"
+Options:\n\
+  -a, --ask    : Ask before preforming changes\n\
+  -y, --yes    : Preform requested changes without asking\n\
+  -f, --full   : Print full output with format\n\
+  -p, --plain  : Print simplified output without formatting\n\
+  -s, --silent : Print nothing, useful to get return codes\n\
+  -c, --count  : Print only the count of packages\n\
+"
 
 
 # Import Managers
@@ -71,40 +78,144 @@ if util.has_cmd("pip"):
     managers['pip'] = pip()
 
 
+# List of possible main commands
+available_cmds = {
+        "version", "setup", "status", "enable", "disable", # tools commands
+        "check" # manager commands
+    }
+help_cmds = {"help", "-help", "--help", "-h", "--h"}
+# List of possible options (and their abbreviations)
+available_opts = {
+        "-a":"ask", "--ask":"ask", "-y":"yes", "--yes":"yes",
+        "-f":"full", "--full":"full", "-p":"plain", "--plain":"plain",
+        "-s":"silent", "--silent":"silent", "-c":"count", "--count":"count",
+    }
+# Setup arguements list
+args=[
+        "", # command
+        "", # manager
+        [], # options
+        ""  # package
+    ]
+
 # Parse command line options
-args=["", ""]
-if (len(sys.argv) > 1):
-    if sys.argv[1] in managers or (sys.argv[1] == "all"):
-        args[1] = sys.argv[1]
-        if (len(sys.argv) > 2):
-            args[0] = sys.argv[2]
-        if (len(sys.argv) > 3):
-            args = args + sys.argv[3:]
+i=1
+while (i < len(sys.argv)):
+    if sys.argv[i] in help_cmds:
+        args[0] = "help"
+    elif sys.argv[i] in available_cmds:
+        args[0] = sys.argv[i]
+    elif (sys.argv[i] in managers) or (sys.argv[i] == "all"):
+        args[1] = sys.argv[i]
+    elif sys.argv[i][0] == "-":
+        if not sys.argv[i] in available_opts:
+            print(colors.red + "Error: Unknown option '" + sys.argv[i] + \
+                    "'" + colors.none)
+            sys.exit(1)
+        args[2].append(sys.argv[i])
     else:
-        args[0] = sys.argv[1]
-        if (len(sys.argv) > 2):
-            args = args + sys.argv[2:]
-# Check default option
+        if (args[3] == ""):
+            args[3] = sys.argv[i]
+        else:
+            print(colors.red + "Error: Invalid extra input '" + \
+                args[3] + "'" + colors.none)
+        sys.exit(1)
+
+    i += 1
+
+
+# Check if default command should be used
+if (args[0] == ""):
+    if (args[3] == ""):
+        args[0] = "check"
+    else:
+        print(colors.red + "Error: Unknown command '" + args[3] + "'" + colors.none)
+        print("  For more information run 'pmi help'")
+        sys.exit(1)
+# Defualt to all managers
 if (args[1] == ""):
     args[1] = "all"
-if (args[0] == ""):
-    args[0] = "check"
+
+
+# Check for package provided to tool commands
+if (args[0] == "version") or (args[0] == "setup") or (args[0] == "status") or \
+        (args[0] == "enable") or (args[0] == "disable"):
+    if (args[3] != ""):
+        print(colors.red + "Error: Invalid input for " + args[0] + " command '" + \
+                args[3] + "'" + colors.none)
+        sys.exit(1)
+
+# Check invalid options
+if (args[0] == "version"):
+    for o in args[2]:
+        if (available_opts[o] == "full") or (available_opts[o] == "plain"):
+            pass
+        else:
+            print(colors.red + "Error: Invalid options for " + args[0] + \
+                    " command '" + o + "'" + colors.none)
+            sys.exit(1)
+if (args[0] == "setup") or (args[0] == "status"):
+    if (len(args[2]) > 0):
+        print(colors.red + "Error: Invalid options for " + args[0] + " command '" \
+                + args[2][0] + "'" + colors.none)
+        sys.exit(1)
+if (args[0] == "enable") or (args[0] == "disable"):
+    for o in args[2]:
+        if (available_opts[o] == "ask") or (available_opts[o] == "yes"):
+            pass
+        else:
+            print(colors.red + "Error: Invalid options for " + args[0] + \
+                    " command '" + o + "'" + colors.none)
+            sys.exit(1)
+if (args[0] == "check"):
+    for o in args[2]:
+        if (available_opts[o] == "full") or (available_opts[o] == "plain"):
+            pass
+        elif (available_opts[o] == "silent") or (available_opts[o] == "count"):
+            pass
+        else:
+            print(colors.red + "Error: Invalid options for " + args[0] + \
+                    " command '" + o + "'" + colors.none)
+            sys.exit(1)
+
+# Check conflicting options
+for o1 in args[2]:
+    for o2 in args[2]:
+        opt1 = available_opts[o1]
+        opt2 = available_opts[o2]
+        if ((opt1 == "ask") and (opt2 == "ask")) or \
+                ((opt1 == "full") and (opt2 == "plain")) or \
+                ((opt1 == "full") and (opt2 == "silent")) or \
+                ((opt1 == "full") and (opt2 == "count")) or \
+                ((opt1 == "plain") and (opt2 == "silent")) or \
+                ((opt1 == "plain") and (opt2 == "count")) or \
+                ((opt1 == "silent") and (opt2 == "count")):
+            print(colors.red + "Error: Conflicting options '" + o1 + \
+                    "' and '" + o2 + "'" + colors.none)
+            sys.exit(1)
+
+# Set all options to their code
+i=0
+while (i < len(args[2])):
+    args[2][i] = available_opts[args[2][i]]
+    i += 1
+
+if (args[1] != "all"):
+    managers = {args[1]:managers[args[1]]}
+
+
 if DEBUG:
-    print("M: '%s', C: '%s', O: %s" % (args[1], args[0], args[2:]))
+    print("Cmd: '%s', Mng: '%s', Opt: %s, Pkg: '%s'" % (args[0], args[1], args[2], args[3]))
     print("Config: " + util.get_config_dir())
 
 
 
 # Print version
 if (args[0] == "version"):
-    if (len(args) == 2):
-        args.append("message")
-    if (args[2] == "message"):
-        print("Package Manager Investigator : v" + VERSION)
-    elif (args[2] == "number"):
+    if "plain" in args[2]:
         print(VERSION)
     else:
-        print(colors.red + "Error: unkown 'version' subcommand '" + args[2] + "'" + colors.none)
+        print("Package Manager Investigator : v" + VERSION)
     sys.exit(0)
 
 # Print Help Menu
@@ -124,6 +235,7 @@ if (args[0] == "setup"):
         else:
             if util.ask("Disable " + managers[m].title):
                 managers[m].disable()
+        print("")
     print()
     print("PMI is now configured.")
     print("If you need more information run 'pmi help'.")
@@ -141,69 +253,50 @@ if (args[0] == "status"):
         elif (state == -1):
             print(colors.yellow + m.title_formated + "Disabled" + colors.none)
     sys.exit(0)
+
 # Enable specific manager, or enter interactive enabler
 if (args[0] == "enable"):
-    if (args[1] == "all"):
-        if (len(args) == 2):
-            args.append("ask")
-        for m in managers:
-            if (args[2] == "auto"):
-                managers[m].enable()
-            elif (args[2] == "ask"):
-                if managers[m].ready():
-                    managers[m].enable()
-                else:
-                    if util.ask("Enable " + managers[m].title):
-                        managers[m].enable()
-
+    for m in managers.values():
+        if (args[1] == "all"):
+            if (m.config_state == 1):
+                pass
+            elif "yes" in args[2]:
+                m.enable()
             else:
-                print(colors.red + "Error: unkown 'enable' subcommand '" + args[2] + "'" + colors.none)
-    else:
-        if (len(args) == 2):
-            args.append("auto")
-        if (args[2] == "auto"):
-            managers[args[1]].enable()
-        elif (args[2] == "ask"):
-            if util.ask("Enable " + managers[args[1]].title):
-                managers[args[1]].enable()
+                if util.ask("Enable " + m.title):
+                    m.enable()
         else:
-            print(colors.red + "Error: unkown 'enable' subcommand '" + args[2] + "'" + colors.none)
+            if "ask" in args[2]:
+                if util.ask("Enable " + m.title):
+                    m.enable()
+            else:
+                m.enable()
     sys.exit(0)
 # Disable specific manager, or enter interactive disabler
 if (args[0] == "disable"):
-    if (args[1] == "all"):
-        if (len(args) == 2):
-            args.append("ask")
-        for m in managers:
-            if (args[2] == "auto"):
-                managers[m].disable()
-            elif (args[2] == "ask"):
-                if (managers[m].config_state == -1):
-                    managers[m].disable()
-                else:
-                    if util.ask("Disable " + managers[m].title):
-                        managers[m].disable()
+    for m in managers.values():
+        if (args[1] == "all"):
+            if (m.config_state == -1):
+                pass
+            elif "yes" in args[2]:
+                m.disable()
             else:
-                print(colors.red + "Error: unkown 'disable' subcommand '" + args[2] + "'" + colors.none)
-    else:
-        if (len(args) == 2):
-            args.append("auto")
-        if (args[2] == "auto"):
-            managers[args[1]].disable()
-        elif (args[2] == "ask"):
-            if util.ask("Disable " + managers[args[1]].title):
-                managers[args[1]].disable()
+                if util.ask("Disable " + m.title):
+                    m.disable()
         else:
-            print(colors.red + "Error: unkown 'disable' subcommand '" + args[2] + "'" + colors.none)
-
+            if "ask" in args[2]:
+                if util.ask("Disable " + m.title):
+                    m.disable()
+            else:
+                m.disable()
     sys.exit(0)
 
 
 # Check for unconfigured managers
 unconfigured = False
-for m in managers:
-    if (managers[m].config_state == 0):
-        print(colors.red + "Error: " + managers[m].title + " must be enabled or disabled before use." + colors.none)
+for m in managers.values():
+    if (m.config_state == 0):
+        print(colors.red + "Error: " + m.title + " must be enabled or disabled before use." + colors.none)
         unconfigured = True
 if unconfigured:
     sys.exit(1)
@@ -216,62 +309,29 @@ if "dnf" in managers and "yum" in managers:
 
 # Check for available updates
 if (args[0] == "check"):
-    if (len(args) == 2):
-        args.append("list")
-    if (args[2] == "list") and (len(args) == 3):
-        args.append("formatted")
-    if (args[1] == "all"):
-        fin = 0
-        count = 0
-        for m in managers.values():
-            if (m.config_state < 1):
-                continue
-            result = m.check()
-            if (m.check_code == 8):
-                fin = 8
-            if (args[2] == "silent"):
-                pass
-            elif (args[2] == "terse"):
-                m.check_print(False)
-            elif (args[2] == "list"):
-                if (args[3] == "formatted"):
-                    m.check_print()
-                elif (args[3] == "plain"):
-                    if (m.check_code == 8):
-                        for p in m.check_text:
-                            print(p)
-                else:
-                    print(colors.red + "Error: unkown 'check list' subcommand '" + args[3] + "'" + colors.none)
-            elif (args[2] == "count"):
-                count += len(m.check_text)
-            else:
-                print(colors.red + "Error: unkown 'check' subcommand '" + args[2] + "'" + colors.none)
-                sys.exit(1)
-        if (args[2] == "count"):
-            print(count)
-        sys.exit(fin)
-    else:
-        managers[args[1]].check()
-
-        if (args[2] == "terse"):
-            managers[args[1]].check_print(False)
-            #manager.check_print(managers[args[1]].title_formated, (managers[args[1]].check_code == 8))
-        elif (args[2] == "list"):
-            if (args[3] == "formatted"):
-                managers[args[1]].check_print()
-                #manager.check_print(managers[args[1]].title_formated, (managers[args[1]].check_code == 8), managers[args[1]].check_text)
-            elif (args[3] == "plain"):
-                if (managers[args[1]].check_code == 8):
-                    for p in managers[args[1]].check_text:
-                        print(p)
-            else:
-                print(colors.red + "Error: unkown 'check list' subcommand '" + args[3] + "'" + colors.none)
-        elif (args[2] == "count"):
-            print(len(managers[args[1]].check_text))
+    fin = 0
+    count = 0
+    for m in managers.values():
+        if (m.config_state < 1):
+            continue
+        result = m.check()
+        if (m.check_code == 8):
+            fin = 8
+        if "silent" in args[2]:
+            pass
+        elif "count" in args[2]:
+            count += len(m.check_text)
+        elif "plain" in args[2]:
+            for p in m.check_text:
+                print(p)
         else:
-            print(colors.red + "Error: unkown 'check' subcommand '" + args[2] + "'" + colors.none)
-            sys.exit(1)
-        sys.exit(managers[args[1]].check_code)
+            m.check_print()
+    if "count" in args[2]:
+        print(count)
+    sys.exit(fin)
+
+# List installed packages
+#if (args[0] == "list"):
 
 # Error out if command is not found
 print(colors.red + "Error: Unknown command '" + args[0] + "'" + colors.none)

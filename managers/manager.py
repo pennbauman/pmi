@@ -80,11 +80,10 @@ class manager:
         sys.exit(1)
 
     # Print if updates are available and a list of updates if provided
-    def check_print(self, show_list=True):
+    def check_print(self):
         if (self.check_code == 8):
             print(colors.bold + colors.green + self.title_formated + "Updates available." + colors.none)
         else:
             print(colors.bold + colors.yellow + self.title_formated + "No updates available." + colors.none)
-        if show_list:
-            for p in self.check_text:
-                p.print_update(self.width)
+        for p in self.check_text:
+            p.print_update(self.width)
