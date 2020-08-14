@@ -20,9 +20,13 @@ class package:
         if (self.manager == "flatpak"):
             print("  " + self.name)
             return
-        line = "  {name:<" + str(width) + "} [{current} > {new}]"
-        print(line.format(name = self.name, current=self.current_version, new=self.new_version))
+        line = "  {name:<" + str(width) + "}  {current} > {new}"
+        print(line.format(name=self.name, current=self.current_version, new=self.new_version))
 
     # Print installed package information
-    def print_info(self):
-        print(self.name + "  [" + self.current_version + "]")
+    def print_info(self, width=0):
+        if (self.manager == "flatpak"):
+            print("  " + self.name)
+            return
+        line = "  {name:<" + str(width) + "}  {current}"
+        print(line.format(name=self.name, current=self.current_version))

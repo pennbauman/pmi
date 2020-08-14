@@ -36,3 +36,15 @@ class yum(manager):
                 self.check_text.append(package(line[0], self.name, pack_info[line[0]], line[1]))
                 self.width = max(self.width, len(line[0]))
                 i += 1
+
+    # Find installed packages, setup data for printing
+    def list(self):
+        self.enabled_error()
+        cmd = subprocess.run(["yum", "list", "installed"], capture_output=True)
+        text = cmd.stdout.decode("utf-8").split("\n")
+        i=1
+        while (i < len(text)-1):
+            line = text[i].split()
+            self.list_text.append(package(line[0], self.name, line[1]))
+            self.width = max(self.width, len(line[0]))
+            i += 1

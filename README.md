@@ -41,6 +41,8 @@ If a manager is not specified all are used.
 
 `check` Check for updates, the return code is 8 when updates are available. Accepts with `--full`, `--plain`, `--silent`, and `--count` options, `--full` is the default.
 
+`list` List all installed packages. Accepts with `--full`, `--plain`, and `--count` options, `--full` is the default.
+
 If no command is not specified `check` is run.
 
 ### Options

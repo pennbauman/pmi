@@ -45,6 +45,9 @@ Commands:\n\
                   This command is fun if no command is specified\n\
                   Accepts with --full, --plain, --silent, and --count options\n\
                   --full is the default\n\
+  list         : List all installed packages\n\
+                  Accepts with --full, --plain, and --count options\n\
+                  --full is the default\n\
 \n\
 Options:\n\
   -a, --ask    : Ask before preforming changes\n\
@@ -81,7 +84,7 @@ if util.has_cmd("pip"):
 # List of possible main commands
 available_cmds = {
         "version", "setup", "status", "enable", "disable", # tools commands
-        "check" # manager commands
+        "check", "list" # manager commands
     }
 help_cmds = {"help", "-help", "--help", "-h", "--h"}
 # List of possible options (and their abbreviations)
@@ -114,6 +117,10 @@ while (i < len(sys.argv)):
             sys.exit(1)
         args[2].append(sys.argv[i])
     else:
+        if (args[0] == ""):
+            print(colors.red + "Error: Unknown command '" + sys.argv[i] + \
+                    "'" + colors.none)
+            sys.exit(1)
         if (args[3] == ""):
             args[3] = sys.argv[i]
         else:
@@ -177,6 +184,17 @@ if (args[0] == "check"):
             print(colors.red + "Error: Invalid options for " + args[0] + \
                     " command '" + o + "'" + colors.none)
             sys.exit(1)
+if (args[0] == "list"):
+    for o in args[2]:
+        if (available_opts[o] == "full") or (available_opts[o] == "plain"):
+            pass
+        elif (available_opts[o] == "count"):
+            pass
+        else:
+            print(colors.red + "Error: Invalid options for " + args[0] + \
+                    " command '" + o + "'" + colors.none)
+            sys.exit(1)
+
 
 # Check conflicting options
 for o1 in args[2]:
@@ -330,7 +348,21 @@ if (args[0] == "check"):
     sys.exit(fin)
 
 # List installed packages
-#if (args[0] == "list"):
+if (args[0] == "list"):
+    count = 0
+    for m in managers.values():
+        m.list()
+        if "count" in args[2]:
+            count += len(m.list_text)
+        elif "plain" in args[2]:
+            for p in m.list_text:
+                print(p)
+        else:
+            m.list_print()
+    if "count" in args[2]:
+        print(count)
+    sys.exit(0)
+
 
 # Error out if command is not found
 print(colors.red + "Error: Unknown command '" + args[0] + "'" + colors.none)

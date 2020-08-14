@@ -18,11 +18,15 @@ class manager:
 
     # Initialize and check configuration
     def __init__(self):
-        self.check_code=-1
-        self.check_text=[]
-        self.width = 0
         self.name = self.__class__.__name__
         self.title_formated = "{:<8} : ".format(self.title)
+
+        self.width = 0
+
+        self.check_code=-1
+        self.check_text=[]
+
+        self.list_text=[]
         # Check manager installed
         if not util.has_cmd(self.name):
             self.config_state = -2
@@ -88,7 +92,7 @@ class manager:
 
     # Check for updates, setup check data for printing
     def check(self):
-        print(colors.violet + self.title + ": check_run() unimplemented" + colors.none)
+        print(colors.violet + self.title + ": check() unimplemented" + colors.none)
         sys.exit(1)
 
     # Print if updates are available and a list of updates if provided
@@ -99,3 +103,15 @@ class manager:
             print(colors.bold + colors.yellow + self.title_formated + "No updates available." + colors.none)
         for p in self.check_text:
             p.print_update(self.width)
+
+
+    # Find installed packages, setup data for printing
+    def list(self):
+        print(colors.violet + self.title + ": list() unimplemented" + colors.none)
+        sys.exit(1)
+
+    # Print list of installed packages
+    def list_print(self):
+        print(colors.bold + self.title_formated + "Installed Packages" + colors.none)
+        for p in self.list_text:
+            p.print_info(self.width)
