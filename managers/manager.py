@@ -48,15 +48,11 @@ class manager:
     # Check if enabled and error if not
     def enabled_error(self):
         if (self.config_state == -2):
-            print(colors.red + "Error: " + self.title + " isn't even installed" + colors.none)
-            sys.exit(1)
+            util.error(self.title + " isn't even installed", False)
         if (self.config_state == -1):
-            print(colors.red + "Error: " + self.title + " is disabled" + colors.none)
-            sys.exit(1)
+            util.error(self.title + " is disabled", False)
         if (self.config_state == 0):
-            print(colors.red + "Error: " + self.title + " must be enabled or disabled before use." + colors.none)
-            sys.exit(1)
-
+            util.error(self.title + " must be enabled or disabled before use.")
 
 
     # Enable manager
@@ -98,9 +94,9 @@ class manager:
     # Print if updates are available and a list of updates if provided
     def check_print(self):
         if (self.check_code == 8):
-            print(colors.bold + colors.green + self.title_formated + "Updates available." + colors.none)
+            print(colors.bold + colors.yellow + self.title_formated + "Updates available" + colors.none)
         else:
-            print(colors.bold + colors.yellow + self.title_formated + "No updates available." + colors.none)
+            print(colors.bold + self.title_formated + "No updates available" + colors.none)
         for p in self.check_text:
             p.print_update(self.width)
 

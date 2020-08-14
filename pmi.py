@@ -112,33 +112,21 @@ while (i < len(sys.argv)):
         args[1] = sys.argv[i]
     elif sys.argv[i][0] == "-":
         if not sys.argv[i] in available_opts:
-            print(colors.red + "Error: Unknown option '" + sys.argv[i] + \
-                    "'" + colors.none)
-            sys.exit(1)
+            util.error("Unknown option '" + sys.argv[i] + "'")
         args[2].append(sys.argv[i])
     else:
         if (args[0] == ""):
-            print(colors.red + "Error: Unknown command '" + sys.argv[i] + \
-                    "'" + colors.none)
-            sys.exit(1)
+            util.error("Unknown command '" + sys.argv[i] + "'")
         if (args[3] == ""):
             args[3] = sys.argv[i]
         else:
-            print(colors.red + "Error: Invalid extra input '" + \
-                args[3] + "'" + colors.none)
-        sys.exit(1)
-
+            util.error("Invalid extra input '" + args[3] + "'", False)
     i += 1
 
 
 # Check if default command should be used
 if (args[0] == ""):
-    if (args[3] == ""):
-        args[0] = "check"
-    else:
-        print(colors.red + "Error: Unknown command '" + args[3] + "'" + colors.none)
-        print("  For more information run 'pmi help'")
-        sys.exit(1)
+    args[0] = "check"
 # Defualt to all managers
 if (args[1] == ""):
     args[1] = "all"
@@ -148,9 +136,8 @@ if (args[1] == ""):
 if (args[0] == "version") or (args[0] == "setup") or (args[0] == "status") or \
         (args[0] == "enable") or (args[0] == "disable"):
     if (args[3] != ""):
-        print(colors.red + "Error: Invalid input for " + args[0] + " command '" + \
-                args[3] + "'" + colors.none)
-        sys.exit(1)
+        util.error("Invalid input for " + args[0] + " command '" + args[3] + "'", \
+                False)
 
 # Check invalid options
 if (args[0] == "version"):
@@ -158,22 +145,17 @@ if (args[0] == "version"):
         if (available_opts[o] == "full") or (available_opts[o] == "plain"):
             pass
         else:
-            print(colors.red + "Error: Invalid options for " + args[0] + \
-                    " command '" + o + "'" + colors.none)
-            sys.exit(1)
+            util.error("Invalid options for " + args[0] + " command '" + o + "'")
 if (args[0] == "setup") or (args[0] == "status"):
     if (len(args[2]) > 0):
-        print(colors.red + "Error: Invalid options for " + args[0] + " command '" \
-                + args[2][0] + "'" + colors.none)
-        sys.exit(1)
+        util.error("Invalid options for " + args[0] + " command '" + args[2][0] \
+                + "'")
 if (args[0] == "enable") or (args[0] == "disable"):
     for o in args[2]:
         if (available_opts[o] == "ask") or (available_opts[o] == "yes"):
             pass
         else:
-            print(colors.red + "Error: Invalid options for " + args[0] + \
-                    " command '" + o + "'" + colors.none)
-            sys.exit(1)
+            util.error("Invalid options for " + args[0] + " command '" + o + "'")
 if (args[0] == "check"):
     for o in args[2]:
         if (available_opts[o] == "full") or (available_opts[o] == "plain"):
@@ -181,9 +163,7 @@ if (args[0] == "check"):
         elif (available_opts[o] == "silent") or (available_opts[o] == "count"):
             pass
         else:
-            print(colors.red + "Error: Invalid options for " + args[0] + \
-                    " command '" + o + "'" + colors.none)
-            sys.exit(1)
+            util.error("Invalid options for " + args[0] + " command '" + o + "'")
 if (args[0] == "list"):
     for o in args[2]:
         if (available_opts[o] == "full") or (available_opts[o] == "plain"):
@@ -191,9 +171,7 @@ if (args[0] == "list"):
         elif (available_opts[o] == "count"):
             pass
         else:
-            print(colors.red + "Error: Invalid options for " + args[0] + \
-                    " command '" + o + "'" + colors.none)
-            sys.exit(1)
+            util.error("Invalid options for " + args[0] + " command '" + o + "'")
 
 
 # Check conflicting options
@@ -201,15 +179,14 @@ for o1 in args[2]:
     for o2 in args[2]:
         opt1 = available_opts[o1]
         opt2 = available_opts[o2]
-        if ((opt1 == "ask") and (opt2 == "ask")) or \
+        if ((opt1 == "ask") and (opt2 == "yes")) or \
                 ((opt1 == "full") and (opt2 == "plain")) or \
                 ((opt1 == "full") and (opt2 == "silent")) or \
                 ((opt1 == "full") and (opt2 == "count")) or \
                 ((opt1 == "plain") and (opt2 == "silent")) or \
                 ((opt1 == "plain") and (opt2 == "count")) or \
                 ((opt1 == "silent") and (opt2 == "count")):
-            print(colors.red + "Error: Conflicting options '" + o1 + \
-                    "' and '" + o2 + "'" + colors.none)
+            util.error("Conflicting options '" + o1 + "' and '" + o2 + "'")
             sys.exit(1)
 
 # Set all options to their code
@@ -313,10 +290,12 @@ if (args[0] == "disable"):
 unconfigured = False
 for m in managers.values():
     if (m.config_state == 0):
-        print(colors.red + "Error: " + m.title + " must be enabled or disabled before use." + colors.none)
-        unconfigured = True
-if unconfigured:
-    sys.exit(1)
+        m.enabled_error()
+
+# Check for disabled manager being specified
+if (args[1] != "all"):
+    if (managers[args[1]].config_state < 0):
+        managers[args[1]].enabled_error()
 
 # Check if duplicate managers are inabled
 if "dnf" in managers and "yum" in managers:
@@ -351,6 +330,8 @@ if (args[0] == "check"):
 if (args[0] == "list"):
     count = 0
     for m in managers.values():
+        if (m.config_state < 1):
+            continue
         m.list()
         if "count" in args[2]:
             count += len(m.list_text)
@@ -365,6 +346,5 @@ if (args[0] == "list"):
 
 
 # Error out if command is not found
-print(colors.red + "Error: Unknown command '" + args[0] + "'" + colors.none)
-print("  For more information run 'pmi help'")
+util.error("Unknown command '" + args[0] + "'")
 sys.exit(1)
