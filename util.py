@@ -26,6 +26,11 @@ def get_config_dir():
             sys.exit(1)
     return config_dir
 
+def mk_config_dir():
+    config_dir = get_config_dir()
+    if not os.path.isdir(config_dir):
+        os.mkdir(config_dir)
+
 def ask(question):
     while True:
         response = input(question + " [y/n]: ")

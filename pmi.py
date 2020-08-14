@@ -235,8 +235,7 @@ if (args[0] == "setup"):
         else:
             if util.ask("Disable " + managers[m].title):
                 managers[m].disable()
-        print("")
-    print()
+        print()
     print("PMI is now configured.")
     print("If you need more information run 'pmi help'.")
     sys.exit(0)
@@ -304,7 +303,7 @@ if unconfigured:
 # Check if duplicate managers are inabled
 if "dnf" in managers and "yum" in managers:
     if (managers["yum"].config_state == 1) and (managers["yum"].config_state == 1):
-        print(colors.yellow + "Warning: Both Yum and DNF installed, they will act as duplicates." + colors.none)
+        print(colors.yellow + "Warning: Both Yum and DNF enabled, they will act as duplicates." + colors.none)
 
 
 # Check for available updates

@@ -60,8 +60,14 @@ class manager:
         if (self.config_state == 1):
             print(self.title + " already enabled.")
         else:
-            os.system("sed '/" + self.name + "/d' -i " + util.get_config_dir() + "/config")
-            config = open(util.get_config_dir() + "/config", 'a').write(self.name + ":enabled\n")
+            if os.path.isfile(util.get_config_dir() + "/config"):
+                os.system("sed '/" + self.name + "/d' -i " + util.get_config_dir() + "/config")
+                config = open(util.get_config_dir() + "/config", 'a').write(self.name + \
+                        ":enabled\n")
+            else:
+                util.mk_config_dir()
+                config = open(util.get_config_dir() + "/config", 'w').write(self.name + \
+                        ":enabled\n")
             print(self.title + " successfully enabled.")
 
     # Disable manager
@@ -69,8 +75,14 @@ class manager:
         if (self.config_state == -1):
             print(self.title + " already disabled.")
         else:
-            os.system("sed '/" + self.name + "/d' -i " + util.get_config_dir() + "/config")
-            config = open(util.get_config_dir() + "/config", 'a').write(self.name + ":disabled\n")
+            if os.path.isfile(util.get_config_dir() + "/config"):
+                os.system("sed '/" + self.name + "/d' -i " + util.get_config_dir() + "/config")
+                config = open(util.get_config_dir() + "/config", 'a').write(self.name + \
+                        ":disabled\n")
+            else:
+                util.mk_config_dir()
+                config = open(util.get_config_dir() + "/config", 'w').write(self.name + \
+                        ":disbled\n")
             print(self.title + " successfully disabled.")
 
 
