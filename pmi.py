@@ -9,7 +9,7 @@ import colors
 from managers.manager import manager
 
 # Globals
-VERSION="0.8"
+VERSION="0.9"
 DEBUG=False
 HELP=colors.bold + "Package Manager Investigator" + colors.none + "\n\
 Usage:\n\
@@ -17,7 +17,7 @@ Usage:\n\
 \n\
 Package Managers:\n\
   all          : Run command for all mangers, this the default\n\
-  dnf          : DNF for Fedora, CentOS, and RHEL\n\
+  dnf          : DNF for Fedora\n\
   yum          : Yum for Fedora, CentOS, and RHEL\n\
   flatpak      : Flatpak\n\
   npm          : Node.js package manager\n\
@@ -48,6 +48,8 @@ Commands:\n\
   list         : List all installed packages\n\
                   Accepts with --full, --plain, and --count options\n\
                   --full is the default\n\
+                  If a package name is provided to this command it will only list \n\
+                   package including that name\n\
 \n\
 Options:\n\
   -a, --ask    : Ask before preforming changes\n\
@@ -332,7 +334,7 @@ if (args[0] == "list"):
     for m in managers.values():
         if (m.config_state < 1):
             continue
-        m.list()
+        m.list(args[3])
         if "count" in args[2]:
             count += len(m.list_text)
         elif "plain" in args[2]:

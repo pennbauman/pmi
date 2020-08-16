@@ -38,7 +38,7 @@ class yum(manager):
                 i += 1
 
     # Find installed packages, setup data for printing
-    def list(self):
+    def list(self, name=""):
         self.enabled_error()
         cmd = subprocess.run(["yum", "list", "installed"], capture_output=True)
         text = cmd.stdout.decode("utf-8").split("\n")
@@ -48,3 +48,5 @@ class yum(manager):
             self.list_text.append(package(line[0], self.name, line[1]))
             self.width = max(self.width, len(line[0]))
             i += 1
+        if (name != ""):
+            self.list_find(name)

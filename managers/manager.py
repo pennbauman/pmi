@@ -106,8 +106,22 @@ class manager:
         print(colors.violet + self.title + ": list() unimplemented" + colors.none)
         sys.exit(1)
 
+    # Search through packages by string
+    def list_find(self, name):
+        new_text = []
+        l = len(name)
+        for p in self.list_text:
+            if name in p.name.lower():
+                i = p.name.lower().find(name)
+                p.name = p.name[0:i] + colors.green + p.name[i:i+l] + \
+                        colors.none + p.name[i+l:]
+                new_text.append(p)
+        self.list_text = new_text
+
     # Print list of installed packages
     def list_print(self):
         print(colors.bold + self.title_formated + "Installed Packages" + colors.none)
+        if (len(self.list_text) == 0):
+            print("  none found")
         for p in self.list_text:
             p.print_info(self.width)

@@ -29,9 +29,10 @@ class flatpak(manager):
                 i += 1
 
     # Find installed packages, setup data for printing
-    def list(self):
+    def list(self, name=""):
         self.enabled_error()
-        cmd = subprocess.run(["flatpak", "list"], capture_output=True)
+        cmd = subprocess.run(["flatpak", "list", "--columns=application"], \
+                capture_output=True)
         text = cmd.stdout.decode("utf-8").split("\n")
         i=1
         while (i < len(text)-1):
@@ -39,3 +40,5 @@ class flatpak(manager):
             na = colors.violet + "N/A" + colors.none
             self.list_text.append(package(line[0], self.name, na))
             i += 1
+        if (name != ""):
+            self.list_find(name)
