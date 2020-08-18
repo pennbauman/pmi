@@ -42,3 +42,17 @@ class flatpak(manager):
             i += 1
         if (name != ""):
             self.list_find(name)
+
+    # Search for packages to install
+    def search(self, term=""):
+        self.enabled_error()
+        cmd = subprocess.run(["flatpak", "search", term, \
+                "--columns=application,description"], capture_output=True)
+        text = cmd.stdout.decode("utf-8").split("\n")
+        i=1
+        while (i < len(text)-1):
+            name = text[i].split()[0]
+            desc = text[i][len(name) + 1:]
+            self.search_text.append(package(name, self.name, desc=desc))
+            self.width = max(self.width, len(name))
+            i += 1

@@ -41,3 +41,14 @@ class pip(manager):
             i += 1
         if (name != ""):
             self.list_find(name)
+
+    # Search for packages to install
+    def search(self, term=""):
+        self.enabled_error()
+        cmd = subprocess.run(["python", "-m", "pip", "list", "term"], capture_output=True)
+        text = cmd.stdout.decode("utf-8").split("\n")
+        i=2
+        while (i < len(text)-1):
+            line = text[i].split()
+            self.search_text.append(package(line[0], self.name))
+            i += 1

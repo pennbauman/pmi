@@ -27,6 +27,7 @@ class manager:
         self.check_text=[]
 
         self.list_text=[]
+        self.search_text=[]
         # Check manager installed
         if not util.has_cmd(self.name):
             self.config_state = -2
@@ -102,7 +103,7 @@ class manager:
 
 
     # Find installed packages, setup data for printing
-    def list(self):
+    def list(self, name=""):
         print(colors.violet + self.title + ": list() unimplemented" + colors.none)
         sys.exit(1)
 
@@ -112,9 +113,9 @@ class manager:
         l = len(name)
         for p in self.list_text:
             if name in p.name.lower():
-                i = p.name.lower().find(name)
-                p.name = p.name[0:i] + colors.green + p.name[i:i+l] + \
-                        colors.none + p.name[i+l:]
+                #i = p.name.lower().find(name)
+                #p.name = p.name[0:i] + colors.green + p.name[i:i+l] + \
+                        #colors.none + p.name[i+l:]
                 new_text.append(p)
         self.list_text = new_text
 
@@ -122,6 +123,19 @@ class manager:
     def list_print(self):
         print(colors.bold + self.title_formated + "Installed Packages" + colors.none)
         if (len(self.list_text) == 0):
-            print("  none found")
+            print("  no packages found")
         for p in self.list_text:
             p.print_info(self.width)
+
+    # Search for packages to install
+    def search(self, term):
+        print(colors.violet + self.title + ": search() unimplemented" + colors.none)
+        sys.exit(1)
+
+    # Print search results
+    def search_print(self):
+        print(colors.bold + self.title_formated + "Search Results" + colors.none)
+        if (len(self.search_text) == 0):
+            print("  no packages found")
+        for p in self.search_text:
+            p.print_search(self.width)

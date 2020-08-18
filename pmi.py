@@ -9,7 +9,7 @@ import colors
 from managers.manager import manager
 
 # Globals
-VERSION="0.9"
+VERSION="1.0"
 DEBUG=False
 HELP=colors.bold + "Package Manager Investigator" + colors.none + "\n\
 Usage:\n\
@@ -50,6 +50,9 @@ Commands:\n\
                   --full is the default\n\
                   If a package name is provided to this command it will only list \n\
                    package including that name\n\
+  search       : Search for packages to install based to provided search term\n\
+                  Accepts --full and --plain\n\
+                  --full is the default\n\
 \n\
 Options:\n\
   -a, --ask    : Ask before preforming changes\n\
@@ -86,7 +89,7 @@ if util.has_cmd("pip"):
 # List of possible main commands
 available_cmds = {
         "version", "setup", "status", "enable", "disable", # tools commands
-        "check", "list" # manager commands
+        "check", "list", "search" # manager commands
     }
 help_cmds = {"help", "-help", "--help", "-h", "--h"}
 # List of possible options (and their abbreviations)
@@ -344,6 +347,21 @@ if (args[0] == "list"):
             m.list_print()
     if "count" in args[2]:
         print(count)
+    sys.exit(0)
+
+# Search for packages to install
+if (args[0] == "search"):
+    if (args[3] == ""):
+        util.error("Search command requires an arguement", False)
+    for m in managers.values():
+        if (m.config_state < 1):
+            continue
+        m.search(args[3])
+        if "plain" in args[2]:
+            for p in m.search_text:
+                print(p)
+        else:
+            m.search_print()
     sys.exit(0)
 
 

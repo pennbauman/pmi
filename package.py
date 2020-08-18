@@ -30,3 +30,7 @@ class package:
             return
         line = "  {name:<" + str(width) + "}  {current}"
         print(line.format(name=self.name, current=self.current_version))
+
+    def print_search(self, width=0):
+        line = "  {name:<" + str(width) + "}  {desc}"
+        print(line.format(name=self.name, desc=self.desc))

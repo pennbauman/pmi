@@ -43,6 +43,8 @@ If a manager is not specified all are used.
 
 - `list` List all installed packages. Accepts with `--full`, `--plain`, and `--count` options, `--full` is the default. If a package name is provided to this command it will only list package including that name.
 
+- `search` Search for packages to install based to provided search term. Accepts `--full` and `--plain`, `--full` is the default.
+
 If no command is not specified `check` is run.
 
 ### Options
