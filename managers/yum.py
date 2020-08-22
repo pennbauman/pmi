@@ -32,6 +32,8 @@ class yum(manager):
             text = cmd.stdout.decode("utf-8").split("\n")
             i=2
             while (i < len(text)-1):
+                if (text[i] == "Obsoleting Packages"):
+                    break
                 line = text[i].split()
                 self.check_text.append(package(line[0], self.name, pack_info[line[0]], line[1]))
                 self.width = max(self.width, len(line[0]))
