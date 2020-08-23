@@ -9,7 +9,7 @@ import colors
 from managers.manager import manager
 
 # Globals
-VERSION="1.0.1"
+VERSION="1.1.0"
 DEBUG=False
 HELP=colors.bold + "Package Manager Investigator" + colors.none + "\n\
 Usage:\n\
@@ -19,6 +19,8 @@ Package Managers:\n\
   all          : Run command for all mangers, this the default\n\
   dnf          : DNF for Fedora\n\
   yum          : Yum for Fedora, CentOS, and RHEL\n\
+  pacman       : Pacman for archlinux\n\
+  yay          : Yet Another Yogurt archlinux AUR helper\n\
   flatpak      : Flatpak\n\
   npm          : Node.js package manager\n\
   pip          : Python package manager\n\
@@ -73,6 +75,12 @@ if util.has_cmd("dnf"):
 if util.has_cmd("yum"):
     from managers.yum import yum
     managers['yum'] = yum()
+if util.has_cmd("pacman"):
+    from managers.pacman import pacman
+    managers['pacman'] = pacman()
+if util.has_cmd("yay"):
+    from managers.yay import yay
+    managers['yay'] = yay()
 # Sandboxed package managers
 if util.has_cmd("flatpak"):
     from managers.flatpak import flatpak
@@ -304,8 +312,11 @@ if (args[1] != "all"):
 
 # Check if duplicate managers are inabled
 if "dnf" in managers and "yum" in managers:
-    if (managers["yum"].config_state == 1) and (managers["yum"].config_state == 1):
+    if (managers["dnf"].config_state == 1) and (managers["yum"].config_state == 1):
         print(colors.yellow + "Warning: Both Yum and DNF enabled, they will act as duplicates." + colors.none)
+if "pacman" in managers and "yay" in managers:
+    if (managers["pacman"].config_state == 1) and (managers["yay"].config_state == 1):
+        print(colors.yellow + "Warning: Both Pacman and Yay enabled, they will act as duplicates." + colors.none)
 
 
 # Check for available updates

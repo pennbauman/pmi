@@ -17,6 +17,10 @@ Requires root access:
 
 - [Yum](https://fedoraproject.org/wiki/Yum)
 
+- [Pacman](https://wiki.archlinux.org/index.php/pacman)
+
+- [Yay](https://github.com/Jguer/yay)
+
 - [Flatpak](https://www.flatpak.org/)
 
 - [npm](https://www.npmjs.com/)
