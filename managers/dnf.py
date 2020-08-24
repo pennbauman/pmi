@@ -20,7 +20,8 @@ class dnf(manager):
         else:
             self.check_code = 0
         if self.check_code:
-            pack_cmd = subprocess.run(["dnf", "list", "installed"], capture_output=True)
+            pack_cmd = subprocess.run(["dnf", "list", "installed"], \
+                    capture_output=True)
             pack_cmd = pack_cmd.stdout.decode("utf-8").split("\n")
             pack_info = {}
             i=1
@@ -30,7 +31,10 @@ class dnf(manager):
                 i += 1
 
             text = cmd.stdout.decode("utf-8").split("\n")
-            i=2
+            i=1
+            while (text[i] != ""):
+                i += 1
+            i += 1
             while (i < len(text)-1):
                 if (text[i] == "Obsoleting Packages"):
                     break
