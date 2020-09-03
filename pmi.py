@@ -9,7 +9,7 @@ import colors
 from managers.manager import manager
 
 # Globals
-VERSION="1.1.2"
+VERSION="1.2.0"
 DEBUG=False
 HELP=colors.bold + "Package Manager Investigator" + colors.none + "\n\
 Usage:\n\
@@ -21,6 +21,7 @@ Package Managers:\n\
   yum          : Yum for Fedora, CentOS, and RHEL\n\
   pacman       : Pacman for archlinux\n\
   yay          : Yet Another Yogurt archlinux AUR helper\n\
+  apt          : APT for Debian and Ubuntu\n\
   flatpak      : Flatpak\n\
   npm          : Node.js package manager\n\
   pip          : Python package manager\n\
@@ -81,6 +82,9 @@ if util.has_cmd("pacman"):
 if util.has_cmd("yay"):
     from managers.yay import yay
     managers['yay'] = yay()
+if util.has_cmd("apt"):
+    from managers.apt import apt
+    managers['apt'] = apt()
 # Sandboxed package managers
 if util.has_cmd("flatpak"):
     from managers.flatpak import flatpak
