@@ -21,6 +21,8 @@ Requires root access:
 
 - [Yay](https://github.com/Jguer/yay)
 
+- [APT](https://en.wikipedia.org/wiki/APT_(software))
+
 - [Flatpak](https://www.flatpak.org/)
 
 - [npm](https://www.npmjs.com/)
