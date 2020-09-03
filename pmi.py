@@ -9,7 +9,7 @@ import colors
 from managers.manager import manager
 
 # Globals
-VERSION="1.2.0"
+VERSION="1.2.1"
 DEBUG=False
 HELP=colors.bold + "Package Manager Investigator" + colors.none + "\n\
 Usage:\n\

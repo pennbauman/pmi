@@ -36,6 +36,8 @@ class npm(manager):
         i=1
         while (i < len(text)-2):
             line = text[i].split()[1].split("@")
+            if (line[0] == "(empty)"):
+                break
             self.list_text.append(package(line[0], self.name, line[1]))
             self.width = max(self.width, len(line[0]))
             i += 1
