@@ -22,15 +22,13 @@ class flatpak(manager):
         if self.check_code:
             na = colors.violet + "N/A" + colors.none
             text = cmd.stdout.decode("utf-8").split("\n")
-            if (text[1][0:16] == "Required runtime"):
-                line = text[1].split()
-                self.check_text.append(package("Required runtime for " + line[4], self.name, \
-                        na, na))
-                return
-            i=3
-            while (i < len(text)-3):
+            i = 0
+            while (i < len(text)-1):
                 line = text[i].split()
-                self.check_text.append(package(line[1], self.name, na, na))
+                if (len(line) == 0):
+                    pass
+                elif (line[0][-1:] == ".") and line[0][0:-1].isdigit():
+                    self.check_text.append(package(line[1], self.name, na, na))
                 i += 1
 
     # Find installed packages, setup data for printing
