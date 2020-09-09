@@ -38,6 +38,8 @@ class dnf(manager):
             while (i < len(text)-1):
                 if (text[i] == "Obsoleting Packages"):
                     break
+                if (text[i][0:8] == "Security"):
+                    break
                 line = text[i].split()
                 self.check_text.append(package(line[0], self.name, pack_info[line[0]], line[1]))
                 self.width = max(self.width, len(line[0]))
