@@ -1,6 +1,8 @@
 # Colors
-#   Penn Bauman (pennbauman@protonmail.com)
-#   https://github.com/pennbauman/pmi
+#   URL: https://github.com/pennbauman/pmi
+#   License: GPLv3.0
+#   Author:
+#     Penn Bauman (pennbauman@protonmail.com)
 none = '\33[0m'
 
 bold = '\33[1m'

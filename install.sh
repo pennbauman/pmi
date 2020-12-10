@@ -1,6 +1,8 @@
 # Install Script - Package Manager Investigator
-#   Penn Bauman (pennbauman@protonmail.com)
-#   https://github.com/pennbauman/pmi
+#   URL: https://github.com/pennbauman/pmi
+#   License: GPLv3.0
+#   Author:
+#     Penn Bauman (pennbauman@protonmail.com)
 install_dir=/usr/share/pmi
 
 sudo cp pmi.sh /bin/pmi
