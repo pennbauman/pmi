@@ -3,9 +3,6 @@
 #   License: GPLv3.0
 #   Author:
 #     Penn Bauman (pennbauman@protonmail.com)
-
-// IBCMer
-//   URL: https://github.com/pennbauman/ibcmer
 import sys
 import os
 

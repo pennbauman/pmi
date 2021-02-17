@@ -1,3 +1,4 @@
+#!/bin/sh
 # Install Script - Package Manager Investigator
 #   URL: https://github.com/pennbauman/pmi
 #   License: GPLv3.0
